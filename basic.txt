@@ -1,0 +1,377 @@
+------------------------------CHAPTER-I <API-DOCUMENTATION>-------------------------------------------------
+
+- To define how 2 pieces of s/w communicate with each other...
+- There are several types of APIs out there, Ex. web API etc.
+
+
+- fb app ----------API request---------> server
+- fb app <---------API request---------- server [Just returning the data & not the entire web-page]
+
+
+- So a developer needs to know:
+  - What the request looks like so that the server can understand it.
+  - What the response looks like so that they can make sense of the data.
+  
+
+- First web API: Ebay ;)
+
+- API documentation is different than end-user-documentation,
+  - You're writing for developers,
+  - Documents is entirely text-based.
+
+
+
+
+
+
+
+- ------------------------------------ Mash-UPS -------------------------------------------------------
+
+- Allows developers to create apps that "mash-ups" data from different sources.
+  - Ex. app [best places to visit] -> google maps API & best-places-list API
+
+ 
+  
+- ------------------------------------ JSON/XML -------------------------------------------------------
+- Two types of structured data:
+  - Structured data doesn't fit into a table. [Because it's more like a tree]
+  
+  - XML                                                            - JSON
+  - Older                                                          - Simpler  
+  - HTML based                                                     - less text
+  - Data-Type: [String]                                            - Data-Type: [Number/String/Boolean]
+  
+  - Collections: Group of data.
+    - Arrays(Lists)
+    - Dictionaries (lool-up tables)
+    
+- Structured-Data:
+  - Dictionaries of lists.
+  - List of dictionaries.
+  - Dictionaries of dictionaries.
+  - Etc... As many levels as you need.
+  
+  - It can be a very complex tree of data
+  
+  
+  
+  
+  ----------------------------------JSON-----------------------------------
+  
+  - JavaScript Object Notation----------
+    - Basic Data-Types:
+      - Strings,
+      - Numbers [Integers & Decimals, +ve or -ve],
+      - Booleans [No quotation marks]
+      - Null [means "nothing"]
+      
+    - Arrays & Lists [],
+    - Objects {},
+    
+    - Nesting:
+      - involves putting arrays and objects inside each other.
+      - you can put arrays inside objects / objects inside arrays / arrays inside arrays etc.
+      - often a JSON file is one big object with lots of objects and arrays inside.
+    
+    - White Space & Indentation:
+      - ignores white-space,
+      - best-practice:
+        - add an indent for every new level,
+        - end lines with commas,
+        - lots of exceptions to this,
+        - use JSON formatting tools,
+        
+        
+    - Ex.
+      
+      { [key]
+       "song":
+         [value] {
+            "title": "Hey jude",
+            "artist": "The beatles",
+            "musicians":
+               ["john lennon", "paul mccartney", "george harrison"]
+         }
+      }
+      
+      
+    - Ex. <ex2>
+      
+{
+  "menu": [
+    {
+      "header": "Coffee",
+      "items": [
+        { "id": "espresso", "label": "Espresso" },
+        { "id": "latte", "label": "Latte" },
+        { "id": "cappuccino", "label": "Cappuccino" }
+      ]
+    },
+    {
+      "header": "Snacks",
+      "items": [
+        { "id": "croissant", "label": "Croissant" },
+        { "id": "muffin", "label": "Muffin" },
+        { "id": "cookie", "label": "Cookie" }
+      ]
+    },
+    {
+      "header": "Specials",
+      "items": [
+        { "id": "icedCoffee", "label": "Iced Coffee" },
+        { "id": "coldBrew", "label": "Cold Brew" },
+        { "id": "caramelMacchiato", "label": "Caramel Macchiato" }
+      ]
+    }
+  ]
+}
+
+
+
+
+- -------------------------------- Hands-ON Excercise --------------------------------
+
+Exercise I: Create JSON structured data that captures weather forecast data.
+
+Solution: wheather.json [ paste the json here: `https://www.freeformatter.com/json-formatter.html` to validate. ]
+
+`
+{
+	"monday": {
+		"description": "sunny",
+		"max-temperature": 22,
+		"min-temperature": 12,
+		"wind-speed":30,
+		"danger": false,
+	}
+}
+`
+
+Excercise II: Create a JSON data for 3-day forecast...
+
+Solution: threeDay.json
+
+`
+{
+   "forecast": [
+      {
+         "Monday": {
+            "description": "sunny",
+            "max-temperature": 22,
+            "min-temperature": 12,
+            "wind-speed": 30,
+            "danger": false
+         }
+      },
+      {
+         "Tuesday": {
+            "description": "sunny",
+            "max-temperature": 22,
+            "min-temperature": 12,
+            "wind-speed": 30,
+            "danger": false
+         }
+      },
+      {
+         "Wednesday": null
+      }
+   ]
+}
+`
+
+
+
+
+-----------------------------------------Documentation------------------------------------------------
+
+- There is no one way to document JSON files.
+
+
+- JSON details are best documented in one or more tables.
+
+  - Columns include key names, description & type
+  - Can also include additional information
+  
+  - -------------------------------------JSON Response------------------------------------------------
+  Element                   Description                Types            Notes
+  
+  Element: The key of the key/value pair
+  Description: A sentence fragment, usually a descriptive noun,
+  Type: number, string, boolean, array or object,
+  notes: Additional information
+  
+  
+  - -------------------------------------JSON Request------------------------------------------------
+  < Add a column called "Required". >
+  
+  Element                   Description                Types             Required            Notes
+  
+  Element: The key of the key/value pair
+  Description: A sentence fragment, usually a descriptive noun,
+  Type: number, string, boolean, array or object,
+  
+  Required:
+       - Indicates whether you have to have that element,
+       - Fill with either "Required" or "Optional",
+       - If there's some required value, then there must be some "Default-Value" too, Add it to the "Notes" column.
+       
+       
+  notes: Additional information [Like "Default-Value"].
+     
+  
+  - -------------------------------------Nesting------------------------------------------------
+  
+  - Two ways to handle nesting
+  - Indentation:
+    - Best for cases where objects are not reused,
+    - Takes up less space,
+  
+  - Example I:
+  
+  - Song:
+  `
+        { [key]
+       "song":
+         [value] {
+            "title": "Hey jude",
+            "artist": "The beatles",
+            "musicians":
+               ["john lennon", "paul mccartney", "george harrison"]
+         }
+      }
+  `
+  
+  - Ex. <Documentation for Song>
+
++--------------------+----------------------------+--------------------+--------------------------------------+
+| Element            | Description                | Type               | Notes                                |
++--------------------+----------------------------+--------------------+--------------------------------------+
+| song               | Top-level                 | Song data Object   |Object                                |
+|   title            | Song title                | String             |                                      |
+|   artist           | Song artist               | String             |                                      |
+|   musicians        | A list of musicians who   | Array of Strings   | Names of musicians in the song.      |
+|                    | play on the song          |                    |                                      |
++--------------------+----------------------------+--------------------+--------------------------------------+
+  
+
+  - ------------------------------------ Example II <Menu (ex2)>- -------------------------------------------------------
+  
+  - Represents a menu in a User-Interface
+  
+- ---------------------------------------------Method-I -------------------------------------------------
+
++--------------------+----------------------------+--------------------+--------------------------------------+
+| Element            | Description                | Type               | Notes                                |
++--------------------+----------------------------+--------------------+--------------------------------------+
+| menu               | Top-level array containing | Array of objects   | Each object represents a menu        |
+|                    | menus                      |                    | category                             |
+|   header           | Title of the menu section  | String             | E.g., "Coffee", "Snacks",            |
+|                    |                            |                    | "Specials"                           |
+|   items            | List of menu items         | Array of objects   | Contains details of individual menu  |
+|                    |                            |                    | items                                |
+|       id           | Unique identifier for      | String             | Used to identify the item            |
+|                    | the item                   |                    | programmatically                     |
+|       label        | Display name of the item   | String             | Shown in the user interface          |
++--------------------+----------------------------+--------------------+--------------------------------------+
+
+
+
+- ---------------------------------------------Method-II -------------------------------------------------
+  - Table for each object type:
+    - Best for cases where objects are reused,
+    - Takes up more space,
+
+
+- Table I - Menu ----------------------------------------------------------------------------------------------
++--------------------+----------------------------+--------------------+--------------------------------------+
+| Element            | Description                | Type               | Notes                                |
++--------------------+----------------------------+--------------------+--------------------------------------+
+| menu               | Top-level array containing | Array of objects   | Each object represents a menu        |
+|                    | menus                      |                    | category                             |
++--------------------+----------------------------+--------------------+--------------------------------------+
+
+- Table II - Headers & items ----------------------------------------------------------------------------------
++--------------------+----------------------------+--------------------+--------------------------------------+
+| Element            | Description                | Type               | Notes                                |
++--------------------+----------------------------+--------------------+--------------------------------------+
+| header             | Title of the menu section  | String             | E.g., "Coffee", "Snacks",            |
+|                    |                            |                    | "Specials"                           |
+| items              | List of menu items         | Array of objects   | Contains details of individual menu  |
+|                    |                            |                    | items                                |
++--------------------+----------------------------+--------------------+--------------------------------------+
+
+- Table III - ID & label --------------------------------------------------------------------------------------
+
++--------------------+----------------------------+--------------------+--------------------------------------+
+| Element            | Description                | Type               | Notes                                |
++--------------------+----------------------------+--------------------+--------------------------------------+
+| id                 | Unique identifier for      | String             | Used to identify the item            |
+|                    | the item                   |                    | programmatically                     |
+| label              | Display name of the item   | String             | Shown in the user interface          |
++--------------------+----------------------------+--------------------+--------------------------------------+
+
+
+------------------------------------------------------------------------NOTES---------------------------------------------------
+
+  - What goes in Notes?
+  - Default Values
+  - If values are limited.
+    - Examples:
+      - Can have these values: "teacher", "student", "admin",
+      - Must be between 0 to 100.
+      
+
+  - Formatting:
+    - Ex.:
+      - Date is YYYY-MM-DD
+      - URL 
+    
+  - Notes contain default values, value limitations, formatting, and any other information.
+
+
+------------------------------------------------------------------------------Exercise---------------------------------------------------
+
+- Meeting Request
+- Sends JSON as a request to create a new meeting. The JSON looks like this:
+- 
+`
+{
+  "meeting": {
+    "time": "2015-09-01 10:00",
+    "duration": 60,
+    "description": "2016 Strategic Planning Meeting",
+    "location": 15,
+    "invitees": ["michael@example.com", "thelma@example.com", "david@example.com", "leon@example.com"]
+  }
+}
+`
+- JSON response
++--------------------+----------------------------+--------------------+--------------------------------------+
+| Element            | Description                | Type               | Notes                                |
++--------------------+----------------------------+--------------------+--------------------------------------+
+| meeting            | Top-Level                  | Object             | Represents meeting object            |
+|   time             | Scheduled time of meeting  | String             | Format: YYYY-MM-DD HH:MM            |
+|   duration         | Duration of the meeting    | Number             | Measured in minutes                 |
+|   description      | Summary of the meeting     | String             | Brief meeting description           |
+|   location         | Location of the meeting    | Number             | Represents a room number or ID      |
+|   invitees         | List of meeting attendees  | Array of Strings   | Contains email addresses            |
++--------------------+----------------------------+--------------------+--------------------------------------+
+
+
+- More recently, A different approach becoming very popular, Where you provide a sample JSON file followed by the table with no indentation.
+- The JSON sample needs only to show one example of each type of element. [Imagine above table, Just without indentation]
+
+
+
+
+-------------------------------------------------OpenAPI ------------------------------------------------------------------
+
+https://petstore.swagger.io/
+
+https://inspector.swagger.io/
+
+- OpenAPI (swagger):
+  - Provide documentation & test bed for developers
+  - Generate Client libraries
+  - Generate the API (Design-First)
+  - Can be automatically generated
