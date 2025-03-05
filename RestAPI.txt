@@ -1,0 +1,634 @@
+- --------------------------------------------- REST-API-------------------------------------------------
+
+- ----------------------------------------------CHAPTER-I------------------------------------------------
+- Why RESTAPI?
+
+- Used by all major Websites
+- Standard API
+- Developers Except it
+- Supported by all platforms
+- Top Skills
+- Simple to implement
+
+
+- API:
+  - A set of clearly defined methods of communication among various components.
+  
+
+  - Application Interface(AI):
+
+    - Similar to "UI", Interface is expose to user,
+    - In "AI", Interface is a part which is exposed to application, not to the end-user.
+    - Ex. 
+      - GET /account HTTP/1.1
+        Content-Type: application/JSON
+        Host: ...
+
+    - User management s/w  ---------------------Get user's orders----------------------> [API] Orders management s/w
+                                                                                       Exposed API
+
+  
+- Types of API:------------------------------------------------------------------------------------------------------------------------------------------
+
+
+  - OS API                   OS        * Application ask for following from OS:
+    - Ex.               |-----------|  - file system
+                        |   MY app  |  - network devices
+                        |-----------|  - UI elements
+                           OS API [win32 API]
+
+
+  - Library API----------------------------------------------------------------------------------------------------------
+    -                     My App
+
+                         Users Library
+                             |
+                             |
+                             V
+                         [Loggin API]
+                         Logging Library
+
+
+  - Remote API----------------------------------------------------------------------------------------------------------
+
+    -                                           -----proprietary protocol-------->
+                Users components [orders proxy] -----------Network---------------> Orders components
+                         orders proxy can access orders via ^
+
+    - User component & Order component should be developed using same platforms[java/python/.net]
+    - Ex. DCOM/Java RMI/...
+    - Not really popular
+
+
+  - Web API-------------------------------------------------------------------------------------------------------------
+
+    -                                           ----- The Internet -----
+
+          My web app --------------------------------------------------------------> [web API] Weather web app
+
+    - Any platform/OS/Language
+
+
+
+- Importance of API:-----------------------------------------------------------------------------------------------------------------------------
+  - You API will be used:
+    - By your UI [Single Page Application]
+    - To extend your app's reach
+    - To allow monitization
+
+
+
+
+
+
+- ---------------------------------------------CHAPTER-II------------------------------------------------
+- How to Desgin API?
+
+- Web API:
+  - An api exposed by a 'web-component', Allowing other componets to interact with it.
+
+  - Common-Characterisitcs:
+    - Platform Agnostic:
+      
+      - .net ---------------------easily communicates with------------------> [web api] python
+
+
+    - Uses Standard-Protocol [Http]:    
+      - .net -------------------------------------HTPP-----------------------------> [web api] python
+
+
+    - Usually Request/ Response based:
+      - .net <-------------------------HTPP-Request/Response------------------------> [web api] python
+
+  
+  - DIFFERENTIATORS:
+    - Request-Format/ Request Contents/ Response Format/ Response Contents
+
+
+  - TYPES:
+    - REST / SOAP / GraphQL / gRPC
+
+    - SOAP (1998):
+      - Simple Object Access Protocol
+      - XML-based
+      - RPC Style Request-Response [Remote Procedure Call -> Client calls a very specific method.]
+      - Extensible
+      - Outdated
+
+      - Ex. <?xml version="1.0"?>
+            <soap:Envelope
+            xmlns:soap="http://www.w3.org....
+
+
+
+    - REST (2000):
+      - Representational State Transfer
+      - URL + JSON based <Send URL and get back JSON>
+      - Message Style
+      - Standard for APIs
+
+
+
+    - GraphQL (2012):
+      - Enables flexible querying, updating and subscribing to data changes. [Which field u want back specifically]
+      - JSON in & out <Send JSON and get back JSON (;>
+      - NOt so easy implementation
+      - Less optimized than REST
+      - Github: They said not even a single person wants entire data, But only specific fields.
+
+    
+    - gRPC (2015):
+      - Using HTTP/2 (duplex: Server can send messages to the client.)
+      - Uses Protobuf (Serialization protocol & it allows different platforms like .net or java to communicate b/w them using code generators that read the `protobuf-protocol` and message and generate classes that are compliant with the data.)
+      - Because based on Http/2, it supports `bidirectional & streaming messaging`, Something that REST nor GraphQL can support since they're based on HTTP/1.
+      - Quite performant.
+      - Not widely used yet.
+      - Requires specialized libraries at both ends because of 'protobuf'[because it needs 'code-generators' at both ends.]
+
+      - Ex. 
+
+        `
+        service HelloService {
+          rpc SayHello (HelloRequest) returns (HelloResponse);
+        }
+
+        message HelloRequest {
+          string greeting = 1;
+        }
+
+        message HelloResponse {
+          string reply = 1;
+        }
+
+        `
+
+    
+
+
+- ---------------------------------------------CHAPTER-III------------------------------------------------
+
+- REST [Representational State Transfer]:
+  - REST API enables transfer of representation of a resource's state.
+  - [state: * current resource properties,
+            * result of an action on resource.]
+                                   
+                                        [order no. 1]
+  - client -------------------request for resource's state----------------------> server
+           <------------------response with resource's state--------------------- server
+                                   [order no. 1 representation]
+
+
+
+                                        [order no. 4]
+  - client -------------------request for delete resource----------------------> server
+           <------------------response with resource's state--------------------- server
+                                      [resource deleted]
+
+
+  - *-------------------------------REST REQUEST/RESPONSE OVER HTTP-------------------------------*
+
+                                        [GET/api/order/1]
+  - client -------------------request for delete resource----------------------> server
+           <------------------response with resource's state--------------------- server
+                                        [200 ok, JSON]
+
+  
+
+
+- ----------------------------------Structure of REST API request----------------------------------------
+
+- METHOD -> HTTP verb (GET/POST/PUT/DELETE).
+
+- URL    -> Location of the resource + parameters.
+
+- Headers-> Meta-data of the request (User Agent).
+
+- Body   -> Contents of the request (optional).
+
+- Ex.
+   [*method]     [*Url]
+  - GET /  api / order / 1
+   [*Headers]
+    User-agent: PostmanRuntime/7.15.2
+    Accept: */*
+    Cache-contol: no-Cache
+    Postman-Token: f7f6f44-----
+    Host: me...
+    Accept-Encoding: gzip, deflate
+    Connection: keep-alive
+
+  
+- ----------------------------------Structure of REST API response----------------------------------------
+
+- Status-Code -> 200(success) / 404 (not found) / ...
+
+- Headers     -> Meta-data of the response (Content-Type).
+
+- Body        -> Contents of the response (optional).
+
+
+- Ex.         [*status]
+  - HTTP/ 1.1 200
+    [*headers]
+    status: 200
+    Date: Fri, 01 jan 2025 09:06:12 IST
+    Content-Type: text/plain
+    Transfer-Encoding: chunked
+    Connection: keep-alive
+    access-control-allow-origin: *;
+    Vary: Accept-Encoding
+
+
+- RESPONSE TYPES:
+  
+  - Usually JSON.
+  - Can also XML or HTML [rarely used].
+
+
+
+
+
+
+
+
+- ---------------------------------------------CHAPTER-IV------------------------------------------------
+- Http Verbs
+
+- Set the action to be performed.
+  [C. R. U. D.]
+  - Retrieve a resource,
+  - Add a resource,
+  - Update a resource,
+  - Delete a resource.
+
+- Part of the HTTP standard.
+- Always use the correct verb!
+- Improves readability.
+- Should be treated as part of the URL.
+
+
+- GET Verb [no body] / [params in "URL"]
+  - Used to retrieve resources.
+  - NEVER use it to add / update / delete resources.
+  - Default verb of the browser's address bar.
+  - Usually combined with parameters.
+  - Should not include body. [method / url / headers].
+  - The length of the "get" request is limited. [usually 1k-2k characters].
+  
+  - Sometimes GET cannot be used for retrieval...
+    - for example: Too many parameters...
+  - in this case - Use POST [we don't generally use POST for retrieval actions but in this case we don't have any choice.].
+
+
+
+- POST Verb [body] / [params in "BODY"]
+  - Used to add resource.
+  - Should contain a message body [body] that specifies the resource to be added.
+  - So POST request always contains a body.
+  - POST is not "Idempotent", As if i send same post request again, new data is created.
+  - Shouldn't contain query string parameters.
+    - Ex. POST /api/entity?company=15  x [incorrect]
+  
+
+
+- PUT Verb [body] / [params in "BODY"]
+  - Used to modify resources.
+  - PUT is "Idempotent". [If we have some method, Then no matter how many times we execute this method, The result will always be the same. NOT TRUE FOR POST[not idempotent]].
+  
+
+
+- DELETE Verb [no body] / [params in "URL"]
+  - Used to delete resource.
+  - Almost always combined with parameters.
+  - Does not contain a "body". [method / url / headers]
+
+
+{"Idempotent": A property of an action that can be applied many times, and the result will always be the same.}
+
+
+
+
+- ---------------------------------------------CHAPTER-V------------------------------------------------
+- Rarely Used Http Verbs
+
+
+- PATCH
+  - Similar to PUT, but with partial updates.
+  - Let if our resource is a car with 5 properties, PATCH allows us to modify/update selected properties only.
+
+
+- HEAD
+  - Same as GET, but without the body in the response.
+  - Ex. GET returns a body, HEAD indicates the server, that it shouldn't return a body but only the status-code.
+        - Let's say i just want to know whether an entity exists or not.
+
+
+- OPTIONS
+  - Describes the available verbs for the URL
+
+  - Ex. curl -X OPTIONS http://example.org -i
+        
+        HTTP/1.1 204 No Content
+        Allow: OPTIONS, GET, HEAD, POST
+
+
+
+- ---------------------------------------------CHAPTER-VI------------------------------------------------
+- URL Structure
+
+- Defines the structure of the API's URL
+- The most important part of the API [Must be well though of]
+
+- Should be:
+  - Self explanatory
+  - Consistent across the API
+  - Predictable
+
+
+- DOMAIN NAME:
+  - First part of the URL
+  - Usually contains FQDN (Fully Qualified Domain Name) or a server name
+    - https://[*api.ebay.com*]/sell/account/....
+
+  - Protocol should be HTTPS
+  - for FQDN - should have "api" in its name. [https://api.myapp.com/]
+
+
+- API WORD
+  - If the domain does not include api, It comes now
+    - htpps://www.myapp.com/api
+    - Emphasizes this URL is for the API, not the website
+    - OR Can be part of the domain name itself.
+      - Ex. https://languages.googleapis.com/v1/documents:...
+
+
+- VERSION
+  - If the version strategy is URL - it comes now
+  - Only natural number
+    - Positive
+    - No decimals
+  
+  - Could be prefixed with "v"
+  - Ex. https://www.myapp.com/api/v1
+
+
+
+- ENTITY
+  - REST deals with resources or entities.
+  - The next part is the entity we're dealing with
+  - Should be one word, no more
+  - NEVER use a verb in "entity"
+    - This is the HTTP Verb role
+    - Ex. /api/v1/order      [order]
+          /api/v2/employees  [employees]
+          /api/v2/travel     [travel]
+
+
+- ID PARAMETER [Optional]
+  - When dealing with a specific entity - next is the entity ID
+  - Relevant for:
+    - GET / PUT / DELETE
+    - Not POST - no id for new entity
+
+
+
+- Sub Entity [Optional]
+  - Used for accessing entities that are dependent on other entities.
+  - Ex. GET all the items of order no. 17
+  
+  - Common mistake:
+    - /api/v1/ItemsInOrder/17
+    - Not readable & Not Simple
+
+  - Correct way:
+    - Should come after the ID parameter.
+      - /api/v1/order/17/items
+
+    - URL is hierarchical, easy to understand.
+  
+  - Same goes for sub-sub-entity etc... [RARE*]
+
+
+
+- QUERY PARAMETERS
+  - Used to query the entities in GET method.
+  - Come at the end of the URL, after "?"
+  - Concatenated with "&"
+    - /api/v1/orders?fromDate=12/12/2027&toDate=2/2/2029
+
+
+
+- Differences b/w Query Parameters & ID Parameters:
+
+                         *Query Parameter                           *ID Parameter                         |
+|                                                                                                         |
+|Location                 At the end of the URL                     End or middle of URL                  |
+|Param Count              0..N parameters [? &]                     1 parameter                           |
+|Example                  /api/v1/orders?user=john                  /api/v1/order/17                      |
+|Return value             May return 0..N entities                  Must return exactly 1 entity          |
+|if not found             That's fine                               Error                                 |
+
+
+- Ex. /api/v1/order/17/items?startsWith=a
+
+
+
+- SINGULAR vs PLURAL
+  - The dilemma:
+    - /api/v1/order/17
+
+    or 
+
+    - /api/v1/orders/17
+
+  - The dilemma #2:
+    - /api/v1/order?user=john
+
+    or 
+
+    - /api/v1/orders?user=john
+
+  - No concrete answer
+  - Best practice: Always prefer readability and ease of use
+  
+  - /api/v1/order/17         [returns single entity]
+  
+  - /api/v1/orders?user=john [return 0..N entities]
+
+
+
+- -------------------------CONCLUSION**----------------------------------
+- HTTP / Domain [FQDN`] + ...
+
+           *version           *id param                 * query parameters        
+              v                 v                            v
+- / api   /   v1    / order    / 17       / items         ? user = john & date = 12/12/2025
+    ^                ^                     ^                                
+  *api word         *entity               *sub-entity              
+
+
+
+- ------------------------QUESTIONS------------------------------------------
+
+- Which URL will you use to retrieve the list of telemetries created by sensor no. 85?
+  - GET /api/v1/sensor/85/telemetries*
+  - GET /api/v1/telemetries?sensorId=85
+  - POST /api/v1/sensor/85/telemetries
+
+  Hint: The 85 is an ID parameter, and should be part of the URL.
+
+
+- Which URL will you use to delete all the items created by John?
+  - DELETE /api/v2/john/items
+  - GET /api/v2/items/john
+  - DELETE /api/v2/items?createdBy=john*
+
+
+- Which URL will you use for adding grades to student no. 15?
+  - POST /api/v1/student/15/grades *
+  - POST /api/v1/grades?student=15
+  - POST /api/v1/grades/15
+
+
+
+
+
+- ---------------------------------------------CHAPTER-VII------------------------------------------------
+- Response Codes
+
+- Importance of Response Codes
+
+  - Most client check for response code and act accordingly.
+  - Monitoring tools checks response codes and report it.
+  - Easier to use and understand the API.
+  - Easy to implement.
+
+
+- Response Code Groups
+
+- Five Groups
+  - Each group represent specific response type (success error etc.)
+  - Each group consists of 3 digits status code.
+
+  - 1xx - Information Response [ DO NOT USE ]
+  - 2xx - Success*
+  - 3xx - Redirection          [ LOW LEVEL (web-server/os) ]
+  - 4xx - Client Errors*
+  - 5xx - Server Errors*
+
+  - 2xx - Success*
+    - 200: ok         [ default status code ]
+    - 201: Created    [ New entity has been created ]
+    - 202: Accepted   [ Request has been accepted & is pending processing / No notification will be given when done processing ]
+    - 204: No Content [ Request was fulfilled but no content was sent back ]
+    
+    - 200 v/s 204:
+      - Q. What should be returned when a GET returns no entity - 200 with no body, or 204 ? 
+        - No agreed upon answer, better to avoid the 204 and use 200.
+
+
+  - 4xx - Client Error*
+    - 400: Bad Request   [JSON can't be parsed / parameters can't be validated]
+    - 401: Unauthorized  [Client is not authorized to access the entity]
+    - 403: Forbidden     [Authorization failed]
+
+    - Authorization Flow:
+      - client ----------request-----------> 401 Unauthorized ----------> Authorized --------------> 403 forbidden
+                  "server: idk who u are"                       "server: now i know who u're & u're forbidden"
+
+    - 404:Page not found [ Entity was looked for, not with query parameter, Not Found ]
+  
+
+  - 5xx - Server Error* 
+    - 500: Something bad happened while processing the request & Client can do nothing about it. 
+    - 5xx: Others are low-level and not used by devs...
+
+  
+  - Additional Codes
+    - Many non-standard codes
+    - Introduced by various companies and organizations
+      - ie. Twitter, Apache, Shopify, and more
+
+    - WebDAV extends the standard for document editing
+      - Adds many status codes
+      - 207 - Multi-Status
+          - Used for cases where multiple entities are handled, each has its own status
+          - ie. Adding a list of 10 entities. Some might fail.
+          
+ 
+- RETURN THE APPROPRIATE STATUS CODE [ Stick to more popular ones ]
+
+    
+
+
+
+- ---------------------------------------------CHAPTER-VII------------------------------------------------
+- Versioning
+
+- You API will be updated but we can't force version upgrade
+
+- Set version support policy:
+  - include versioning in API
+  - Version can come in 3 forms:
+    - in URL [ easiest ]
+    - in Header * [ most appropriate ]
+    - in Query Parameter [ do not use ]
+
+
+
+
+- ---------------------------------------------CHAPTER-VIII------------------------------------------------
+- Authentication & Authorization
+
+- Authentication: Who is the user
+- Authorization:  What user is allowed to do
+
+----------------------------------------------------------------------------------------------------------------------------------------
+- OAuth2:
+  - Std. protocol for authentication & Authorization
+
+  - User                                    Who want to access protected resource in API
+    Client App                              Client application accessing the API
+    Authorization Server                    Authorizes the user for client application
+    Resource Server                         API being accessed
+
+    
+  - Complete flow:
+    - Client App -------------Redirects user to-------------> Authorization server -----------asks user to grant permission [goes back <--]
+                 <------------Returns access token <---------                     <-------------------------------------------------------
+        |    ^   \
+        |    |    \______________________
+        |    | Access API anonymously    |
+        v    |                           | send access token
+      Resource Server (API) <____________|
+
+      - `Resource server must register itself with the Authorization server.`
+
+  
+  - Ex: when you sign up on a site, You get redirected to a page where you see multiple options like "manual sign-up" / "google" / "facebook" or etc, So here "facebook" or etc is acting as an authorization server...
+
+  - Ex: Let's use github as an athorization server... [https://github.com/settings/applications/new]
+        - Auth. callback url: An url that authorization server will call after done authorizing the user.
+
+        - After "register application": We get [clientID] & [clientSecret]
+
+  
+  - What exactly this access token is? JWT
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+- JWT
+
+- Has 3 sections:
+  - Header: Type of token (JWT) & signing algorithm.
+  - Ex:     {"alg": "HS256", "typ": "JWT"}
+  
+  - Has 3 sections:
+    - Payload   - Data on the user {"sub":"1234567890", "name":"john doe", "admin":true}
+    - Signature
+      - Base64 encoded
+      - Concatenated with. [eywertyusdfghndfgbdfgsdff.34564rf23erf2345tsdfvb]
+
+
+
+// GCD: create a code > now explain it in detail > dry run it for me... > try to create the code by yourself...
