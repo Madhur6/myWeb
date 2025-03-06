@@ -562,6 +562,15 @@
 
 
 
+
+
+
+
+
+
+
+
+
 - ---------------------------------------------CHAPTER-VII------------------------------------------------
 - Versioning
 
@@ -573,6 +582,14 @@
     - in URL [ easiest ]
     - in Header * [ most appropriate ]
     - in Query Parameter [ do not use ]
+
+
+
+
+
+
+
+
 
 
 
@@ -594,6 +611,10 @@
 
     
   - Complete flow:
+
+
+
+
     - Client App -------------Redirects user to-------------> Authorization server -----------asks user to grant permission [goes back <--]
                  <------------Returns access token <---------                     <-------------------------------------------------------
         |    ^   \
@@ -601,6 +622,11 @@
         |    | Access API anonymously    |
         v    |                           | send access token
       Resource Server (API) <____________|
+
+      <checks the signature and reads the payload>
+
+
+
 
       - `Resource server must register itself with the Authorization server.`
 
@@ -619,16 +645,106 @@
 ----------------------------------------------------------------------------------------------------------------------------------------
 - JWT
 
+- Contains the data the server needs in order to authenticate the user.
+
 - Has 3 sections:
   - Header: Type of token (JWT) & signing algorithm.
-  - Ex:     {"alg": "HS256", "typ": "JWT"}
+          - Ex:     {"alg": "HS256", "typ": "JWT"}
   
-  - Has 3 sections:
-    - Payload   - Data on the user {"sub":"1234567890", "name":"john doe", "admin":true}
-    - Signature
+  - Payload: Data on the user 
+          - Ex: {"sub":"1234567890", "name":"john doe", "admin":true}
+
+  - Signature: Signed electronically
       - Base64 encoded
-      - Concatenated with. [eywertyusdfghndfgbdfgsdff.34564rf23erf2345tsdfvb]
+      - Concatenated with. 
+        - Ex: [eywertyusdfghndfgbdfgsdff.34564rf23erf2345tsdfvb]
+
+
+  - jwt.io: To look at JWT debugger ✨
+          - Try changing the data and see how encoded version changes...
+
+  
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+- JWT & RESTAPI
+
+- JWT should be sent with the Authorization: bearer header
+
+- Can be sent also in body or request parameter [Not recommended]
+
+- Ex. GET /resource HTTP/1.1
+      Host: server.example.com
+      Authorization: Bearer mF_9.B5f-4.1JqM
 
 
 
-// GCD: create a code > now explain it in detail > dry run it for me... > try to create the code by yourself...
+
+
+
+
+
+
+
+
+
+
+
+- ---------------------------------------------CHAPTER-IX------------------------------------------------
+- PERFORMANCE OF API
+
+- Must be fast
+- related to code that we have written
+
+- Techniques to optimize your code:
+  
+  - 1). Async Operations:
+    -  Don't wait for long operations to complete.
+    -  Ex. async-await of js
+
+  - 2). Caching:
+    -  Store frequently accessed data close to API
+       - Usually in-Memory
+    -  Set expiration and invalidation
+  
+  - 3). Rate limit:
+    - Limit the maximum concurrent requests the API handles
+      - API <----requests [to many 😬]------- So it crashes
+      - API <Rate Limiter> <----------limits the requests --------- Saves
+
+  - 4). Quota:
+    - Limits the number of requests a specific client can make, In result minimizes the risk of heavy load.
+    - Ex. 50,000 requests per project per day. or 10 queries per second per IP address.
+
+
+
+
+
+
+
+- ---------------------------------------------CHAPTER-X------------------------------------------------
+- Monitoring of our API
+
+- Q. the cost of downtime at the world's biggest online retailer?
+ans. $2,646,501 for 13 min. episode of downtime
+
+- Monitoring let's you know about:
+  - Problems before they occur
+  - Problems after they occur
+  - What's going on with your API
+
+
+- Metrics of Monitoring:
+- Q. what to monitor?
+  - Requests / second
+  - no. of failures
+  - latency : "Time single request takes to complete"
+  - CPU
+  - no. of Users
+  - no. of sessions: Single users complete 5 requests ==> 5 sessions
+  - Geographic Distrubution
+  - RAM
+
+- Azure portal for monitoring > availablity > add test > ✨ :)
+
+
