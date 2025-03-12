@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h2>Welcome, <span th:text="${user.name}"></span>!</h2>
+
+    <h3>Google Fit Step Count (Last 24 Hours)</h3>
+
+    <div th:if="${fitData.error}">
+        <p style="color: red;">Error: <span th:text="${fitData.error}"></span></p>
+    </div>
+
+    <div th:unless="${fitData.error}">
+        <p>Steps Data:</p>
+        <pre th:text="${fitData}"></pre>
+    </div>
+
+    <a href="/logout">Logout</a>
+</body>
+</html>

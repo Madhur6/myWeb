@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Health Tracker</title>
+</head>
+<body>
+    <h1>Welcome to Health Tracker</h1>
+    <div th:if="${name}">
+        <p>Hello, <span th:text="${name}"></span>!</p>
+		
+		<form th:action="@{/logout}" method="post">
+		    <button type="submit">Logout</button>
+		</form>
+    </div>
+    <div th:unless="${name}">
+        <a href="/oauth2/authorization/google">Login with Google</a>
+    </div>
+</body>
+</html>
