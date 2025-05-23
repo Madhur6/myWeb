@@ -1,6 +1,35 @@
+# MADHUR'S CHEAT SHEET FOR SPRING-BOOT ⭐😉💻📚
+
+- ----------------------------------------------✨ INDEX ✨---------------------------------------------------
+
+💡 CHAPTER I   : INTRODUCTION TO SPRING / S-MVC / S-BOOT
+
+💡 CHAPTER II  : SETTING UP SPRING-BOOT
+
+💡 CHAPTER III : LOGGING
+
+💡 CHAPTER IV  : MORE SPRING-BOOT (BEANS / CONTROLLER vs REST-CONTROLLERS / REQUEST-MAPPING / AUTOWIRED etc...)
+
+💡 CHAPTER V   : START DEVELOPING
+
+💡 CHAPTER VI  : MONITOR S-B
+
+💡 CHAPTER VII : LET'S LOGIN
+
+💡 CHAPTER VIII: JS-TAG-LIBRARIES
+
+
+
+- ----------------------------------------------✨ INDEX ✨---------------------------------------------------
+					<< LET'S START LEARNING 😊 >>
+
+
+
+
+
 - --------------------------------INTRODUCTION TO SPRING / S-MVC / S-BOOT--------------------------------
 
-- ----------------------------------------------✨CHAPTER-I✨------------------------------------------------
+- ----------------------------------------------✨CHAPTER-I✨--------------------------------------------
 
 Understanding Spring Boot vs Spring MVC vs Spring
 
