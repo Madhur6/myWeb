@@ -1,0 +1,569 @@
+- --------------------------------INTRODUCTION TO SPRING / S-MVC / S-BOOT--------------------------------
+
+- ----------------------------------------------✨CHAPTER-I✨------------------------------------------------
+
+Understanding Spring Boot vs Spring MVC vs Spring
+
+*-------------------------------*-------------------------------*
+- Spring Boot vs Spring MVC vs Spring: What's in it?
+
+  - Spring Framework: 
+	Dependency Injection
+
+    - @Component, @Autowired, @Component Scan etc..
+    - Just dependency injection is not sufficient (You need other frameworks to build apps)
+      - Spring modules & spring projects: 
+	- Extend spring eco system
+        - Provide good integration with other frameworks (Hibernate/JPA, JUnit & Mockito for unit testing)
+
+
+*-------------------------------*-------------------------------*
+- Spring MVC (Spring Module): 
+	Simplify building web apps and REST API
+
+    - Building web application with Struts was very complex
+    - @Controller, @RestController, @RequestMapping("/courses")
+
+
+*-------------------------------*-------------------------------*
+  - Spring Boot (Spring Project): 
+	Build Production-Ready apps Quickly
+
+    - Starter Projects - Make it easy to build variety of applications
+    - Auto configuration - Eliminate configuration to setup Spring, Spring MVC and other frameworks!
+    - Enable non functional requirements (NFRs):
+      - Actuator: Enables Advanced Monitoring of applications
+      - Embedded server: No need for separate application servers!
+      - Logging and Error handling.
+      - Profiles and ConfigurationProperties
+
+*-------------------------------*-------------------------------*
+
+// Dependency Management (pom.xml)
+
+// Define web app configuration (web.xml)
+
+// Manage Spring Beans (content.xml)
+
+// Implement non functional requirements (NFRs)
+
+
+
+
+
+- --------------------------------------------⭐CHAPTER-I ENDS⭐----------------------------------------------
+
+
+
+
+
+
+
+
+
+- ------------------------------------------SETTING UP SPRING-BOOT-------------------------------------------
+
+- ---------------------------------------------✨CHAPTER-II✨------------------------------------------------
+
+model: todo
+controller: todoController
+service: todoService
+
+*-------------------------------*-------------------------------*
+
+// Setting up spring boot project: 
+
+   start.spring.io (spring initializer) 
+   - Project:    Maven project 
+   - Language:   Java language
+   - SpringBoot: 3.0.0 ( DO NOT USE "SNAPSHOT" VERSIONS )
+   - Project MetaData > Group / Artifact / Name / Description / Package Name / < Packaging: Jar > / Java: 17 (atleast)
+   
+   -  Dependencies: 
+      - Spring Web
+      - anything else you require....
+      
+   - Generate: will generate a zip file... Happy Coding 😊
+   
+
+// Importing the project:
+   - in eclipse: file > import > existing maven projects ✨
+   
+
+// After importing the project:
+   - src/main/java:      This is where our java code will go
+   - src/main/resources: This is where our application's configuration will go
+   - src/test/java:      This is where our unit tests will go
+   - pom.xml:            All the dependencies 
+
+
+
+
+- --------------------------------------------⭐CHAPTER-II ENDS⭐---------------------------------------------
+
+
+
+
+
+
+
+
+- ----------------------------------------------< LOGGING >--------------------------------------------------
+
+- --------------------------------------------✨CHAPTER-III✨------------------------------------------------
+
+
+Application.properties: [src/main/resources]
+
+- logging.level.org.springframework=debug > "for package `org.springframework`, We want to log at `debug` level."
+                                            - Basically we will see much more logged information when we will run the spring-boot application
+ 
+- logging.level.org.springframework=trace > printing at even lower level
+
+- logging.level.org.springframework=info  > printing at higher level ( not much information * )
+
+- ORDER 💫:
+  trace > debug > info > warning > error > off ...
+            * 
+	    |
+	    |
+         [debug / info / warning / error] is printed :)
+
+*-------------------------------*-------------------------------*
+
+CONDITIONS EVALUATION REPORT:
+
+- Positive matches: Things that were auto-configured.
+
+- Negative matches: Things that did not got auto-configured.
+
+
+
+
+- --------------------------------------------⭐CHAPTER-III ENDS⭐---------------------------------------------
+
+
+
+
+
+
+
+
+- ------------------------------------------< MORE SPRING-BOOT >---------------------------------------------
+
+- --------------------------------------------✨CHAPTER-IV✨-------------------------------------------------
+
+
+
+*-------------------------------*-------------------------------*
+
+// Beans
+   - The objects that form the backbone of your application and that are managed by 
+     the Spring IoC container are called beans. A bean is an object that is instantiated, assembled, 
+     and otherwise managed by a Spring IoC (Inversion of control) container.
+
+
+
+*-------------------------------*-------------------------------*
+@Controller                                                         @RestController
+
+This annotation is used to mark classes                             This is a specialized controller used for RESTful web services.
+as Spring MVC controllers. 
+
+Extends @Component annotation.                                      Extends @Controller annotation.
+
+Returns a view in Spring Web MVC.                                   Cannot return a view.
+
+Requires @ResponseBody for sending responses as JSON or XML.        Assumes @ResponseBody by default for sending responses as JSON or XML, eliminating the need for explicit annotations.
+
+Used for traditional MVC applications                               Used for REST APIs where JSON or XML responses are sent directly to the client.
+where views (JSP, Thymeleaf) are returned.
+
+Introduced in Spring 2.5.                                           Introduced in Spring 4.0.
+
+
+
+#JSON conversion: Done via framework called "jacksonHttpMessageConvertersConfiguration" [bean ---> json]
+
+                 - If you return the arrayList or etc, It'll convert it into "json".
+
+
+
+- To change the server: server.port = 8081
+
+- To return a view, You need @ResponseBody annotation...
+
+- To return a HTML, create a JSP file inside this path: `/src/main/resources/META-INF/resources/WEB-INF/jsp/sayHello.jsp`
+
+
+
+
+
+*-------------------------------*-------------------------------*
+- @Autowired:
+  - Also considers self references for injection (that is, references back to the bean that is currently injected).
+  
+  
+
+
+*-------------------------------*-------------------------------*
+@RequestMapping
+
+- To map requests to controllers methods
+
+- There are also HTTP method specific shortcut variants of @RequestMapping:
+
+  - @GetMapping
+
+  - @PostMapping
+
+  - @PutMapping
+
+  - @DeleteMapping
+
+  - @PatchMapping
+
+
+
+
+
+
+
+
+
+- --------------------------------------------⭐CHAPTER-IV ENDS⭐---------------------------------------------
+
+
+
+- -------------------------------------------< START DEVELOPING >--------------------------------------------
+
+- ---------------------------------------------✨CHAPTER-V✨-------------------------------------------------
+
+
+
+*-------------------------------*-------------------------------*
+- Tired of re-starting your server all the time
+  - Add spring-boot-devtools <But after making modification in pom.xml, Need to restart >
+
+
+
+*-------------------------------*-------------------------------*
+- Keeping things simple 👍
+  Ex. 
+  - Let's say we have 2 environments: 1). developement
+                                      2). production
+  
+  - Creating profiles: 
+    - Copy & paste application.properties > Save as application-dev.props / application-prod.props 
+  
+  - Making use of profiles:
+    - application.properties > spring.profiles.active=prod / dev ( Whatever configuration is in app-prod.props, Has higher priority )
+    
+  
+
+- Talking to different service:
+  - We would need currency-service.url / currency-service.key / currency-service.username
+  - Create a class "currencyServiceConfiguration" & add following annotations: @ConfigurationProperties(prefix = "currency-service") / 
+  - @Component: I want spring-boot to handle this [Basically spring-boot will create an instance of the class]
+  
+
+
+*-------------------------------*-------------------------------*
+- Embedded server:
+  - Already part of our .jar file
+  - steps: - install java
+           - run jar file
+  
+  - maven build > clean install > copy building jar path: <>
+  
+  - cd to path in cmd & location SNAPSHOT.jar
+  - java -jar < full-name of SNAPSHOT.jar >
+
+
+- Add this dependency inside the pom.xml: 
+
+  - ```
+    <dependency>
+		<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		<scope>provided</scope>
+    </dependency>
+    ```
+
+
+
+*-------------------------------*-------------------------------*
+- Modify your application.properties:
+  - spring.mvc.view.prefix=/WEB-INF/jsp/
+    spring.mvc.view.suffix=.jsp
+	logging.level.org.springframework=debug
+
+
+[[
+	# What is a static block?
+	- A static block in Java is a special block of code that runs only once when the class is loaded into memory. 
+  	  It is used to initialize static variables or perform one-time setup tasks.
+]] 
+
+
+
+
+
+
+
+*-------------------------------*-------------------------------*
+// How to display views
+
+- Create a .jsp file inside this path: [/src/main/resources/META-INF/resources/WEB-INF/jsp/sayHello.jsp]
+- Inside your controller: return "jsp-file-name"
+
+
+// Can add request header as parameter
+
+- @RequestMapping(value="login", method=RequestMethod.GET)
+  
+- We use @RequestParam when we want to capture "QueryParameters" like /login?name=harry
+
+
+
+*-------------------------------*-------------------------------*
+// ModelMap
+
+- Pass query-params to our .jsp file, Use ModelMap
+  - @RequestMapping(value="login", method=RequestMethod.GET, ModelMap model)
+  - model.put("name", name) 
+	
+	
+
+
+
+
+
+
+- --------------------------------------------⭐CHAPTER-V ENDS⭐----------------------------------------------
+
+
+
+
+
+
+- ---------------------------------------------< MONITOR S-B >-----------------------------------------------
+
+- ---------------------------------------------✨CHAPTER-VI✨------------------------------------------------
+
+
+Monitor Applications using Spring Boot Actuator
+  
+- Monitor & manage your application in your production
+  
+- Provides a number of endpoints:
+  - beans:   Complete list of spring beans in your app.
+  - health:  Application health information.
+  - metrics: Application metrics.
+  - mappings:Details around Request mappings.
+   
+- spring-boot-starter-actuator <localhost:8080/actuator/*health*>
+
+- To access more information, application.properties: <management.endpoints.web.exposure.include=* or (health,metrics)>
+
+
+
+
+
+
+- --------------------------------------------⭐CHAPTER-VI ENDS⭐----------------------------------------------
+
+
+
+
+
+- ---------------------------------------------< LET'S LOGIN >-----------------------------------------------
+
+- ---------------------------------------------✨CHAPTER-VII✨-----------------------------------------------
+
+
+
+/*
+ ============================================================================
+ 🧠 Login Controller Cheat Sheet - Summary
+
+```HTML✨
+<html>
+	<head>
+		<title> Login </title>
+	</head>
+	<body>
+		<h1> Welcome to my login page </h1>
+		<form method="post">
+			Name: <input type="text" name="name">
+			Password: <input type="password" name="password">
+			<input type="submit">
+		</form>
+	</body>	
+</html>
+```
+ ============================================================================
+ Package:
+     com.prac.myPrac.controller
+
+ Purpose:
+     - Handles login functionality
+     - Uses GET to display login page
+     - Uses POST to process login form
+     - Uses AuthenticationService for validation
+     - Stores username in session using @SessionAttributes
+
+ ----------------------------------------------------------------------------
+ 🔧 Annotations:
+ ----------------------------------------------------------------------------
+ @Controller                 --> Marks class as Spring MVC Controller
+ @SessionAttributes("name")  --> Stores 'name' in session scope
+ @Autowired                  --> Injects AuthenticationService bean
+ @RequestMapping             --> Maps HTTP requests to methods
+
+ ----------------------------------------------------------------------------
+ ✅ GET Request (Display login page):
+ ----------------------------------------------------------------------------
+ @RequestMapping(value="login2", method=RequestMethod.GET)
+ public String goToLoginPage() {
+     return "login";  // Returns login.jsp/html
+ }
+
+ ----------------------------------------------------------------------------
+ ✅ POST Request (Process form):
+ ----------------------------------------------------------------------------
+ @RequestMapping(value="login2", method=RequestMethod.POST)
+ public String goToWelcomePage(@RequestParam String name,
+                               @RequestParam String password,
+                               ModelMap model) {
+     if (authenticationService.authenticate(name, password)) {
+         model.put("name", name);          // Save name to session
+         model.put("password", password);  // For demo purposes only (not secure)
+         return "welcome";                 // Returns welcome.jsp/html
+     }
+     return "login";  // Return to login if authentication fails
+ }
+
+ ----------------------------------------------------------------------------
+ 🔐 AuthenticationService:
+ ----------------------------------------------------------------------------
+ @Autowired
+ private AuthenticationService authenticationService;
+
+ // Constructor-based injection
+ public loginController(AuthenticationService authenticationService) {
+ 	 super();
+     this.authenticationService = authenticationService;
+ }
+ 
+ 
+ 
+ ```AuthenticationService
+ 
+ 	public boolean authenticate(String name, String password) {
+		boolean isValidName = name.equalsIgnoreCase(name);
+		boolean isValidPassword = password.equalsIgnoreCase(password);
+		
+		return isValidName && isValidPassword;
+	}
+ 
+ ```
+
+ ----------------------------------------------------------------------------
+ 🧾 View Mapping:
+ ----------------------------------------------------------------------------
+ login.jsp      --> shown on GET or failed login
+ welcome.jsp    --> shown on successful login
+
+ ----------------------------------------------------------------------------
+ # Notes:
+ ----------------------------------------------------------------------------
+ - Do NOT log or store passwords in production apps
+ - Use hashing to secure user passwords
+ - Logging user credentials is unsafe!
+*/
+
+
+
+
+
+- --------------------------------------------⭐CHAPTER-VII ENDS⭐---------------------------------------------
+
+
+
+
+
+
+
+- ------------------------------------------< JS TAG LIBRARIES >---------------------------------------------
+
+- --------------------------------------------✨CHAPTER-VIII✨-----------------------------------------------
+
+
+- Adding JSTL to jsp pages
+
+```
+<dependency>
+	<groupId>jakarta.servlet.jsp.jstl</groupId>
+	<artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.glassfish.web</groupId>
+    <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+</dependency>
+```
+
+
+*----------------------------*----------------------------*
+1. Directive Tags
+	These tags provide global information about the JSP page to the container (like page settings, imports, etc.)
+
+	Syntax: <%@ directive attribute="value" %>
+	
+2. Scriptlet Tags
+	Used to embed Java code directly into the JSP file.
+
+	Syntax: <% Java code %>
+	
+3. Expression Tags
+	Used to output the result of a Java expression to the client.
+
+	Syntax: <%= expression %>
+	
+4. Declaration Tags
+	Used to declare variables and methods that can be used later in the JSP page.
+
+	Syntax: <%! declaration %>
+	
+	
+5. Action Tags
+	Predefined XML tags that control the behavior of the JSP engine.
+
+	Examples:
+		<jsp:include> – Includes a file at runtime
+		<jsp:forward> – Forwards request to another resource
+		<jsp:param> – Passes parameters
+		<jsp:useBean> – Instantiates or accesses a JavaBean
+		<jsp:setProperty> / <jsp:getProperty> – Sets or gets bean properties
+		
+		
+6. Custom Tags
+	These are user-defined tags or tags from tag libraries like JSTL (Java Standard Tag Library).
+	
+	Example using JSTL:
+	```jsp
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+		<c:if test="${user.loggedIn}">
+   			Welcome, ${user.name}!
+		</c:if>
+	```
+
+
+
+
+
+
+
+
+- --------------------------------------------⭐CHAPTER-VIII ENDS⭐---------------------------------------------
