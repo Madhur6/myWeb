@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<title> Footer </title>
+		<link href="webjars/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" >
+
+	</head>
+	<body>
+		<footer style="margin-top:400px" class="footer bg-dark">
+			<div class="container text-center">
+				<div class="row">
+					<div class="col">
+						<h3> To-Do </h3>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<script src="webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+		<script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+	</body>
+</html>

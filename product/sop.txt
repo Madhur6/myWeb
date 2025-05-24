@@ -1,0 +1,241 @@
+// ADD REQUIRED ANNOTATIONS:
+// @Service / @Autowired
+// Complete all the service methods...
+
+// @RestController / @Autowired
+// Provide annotations in methods:
+// - @RequestBody: [inside parameters] ---> return productService.postProduct(product);
+// - @PathVariable / @RequestParam
+
+// new terminal > sh install.sh > 
+
+
+
+
+
+
+
+
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.warehouse.product.model.product;
+
+@Repository
+public interface productRepository extends JpaRepository<product, Integer> {
+		boolean existsBySku(String sku);
+
+		List<product> findByVendor(String value);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.warehouse.product.model.product;
+import com.warehouse.product.repository.productRepository;
+
+@Service
+public class productService {
+	
+	@Autowired
+	private productRepository productrepository;
+	
+	public Object postProduct(product product) {
+		if (productrepository.existsBySku(product.getSku())) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		try {
+			product p = new product(product.getName(), product.getDescription(),
+					product.getVendor(), product.getPrice(), product.getStock(), product.getCurrency(), product.getImage_url(), product.getSku());
+			productrepository.save(p);
+			return ResponseEntity.status(HttpStatus.CREATED).build();
+			
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+	}
+	
+	
+	
+	
+	public Object getProduct() {
+		List<product> products = productrepository.findAll();
+		if (products.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		return ResponseEntity.ok(products);
+	}
+	
+	
+	public ResponseEntity<Object> getSimilarVendor(String value){
+		List<product> similarProducts = productrepository.findByVendor(value);
+		
+		if (similarProducts.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		return ResponseEntity.ok(similarProducts);
+	}
+	
+	
+	
+	public ResponseEntity<Object> updateProduct(int id, product p){
+		Optional<product> optionalProduct = productrepository.findById(id);
+		if(!optionalProduct.isPresent()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		try {
+			product existProduct = optionalProduct.get();
+			existProduct.setPrice(p.getPrice());
+			existProduct.setStock(p.getStock());
+			product saveProduct = productrepository.save(existProduct);
+			
+			return ResponseEntity.status(HttpStatus.OK).body(saveProduct);
+			
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+	}
+	
+	
+	
+	public ResponseEntity<Object> deleteProductById(int id){
+		if (!productrepository.existsById(id)) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		try {
+			productrepository.deleteById(id);
+			return ResponseEntity.status(HttpStatus.OK).build();
+			
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.warehouse.product.model.product;
+import com.warehouse.product.service.productService;
+
+@RestController
+public class productController {
+	@Autowired
+	private productService pService;
+	
+	@PostMapping("/product/add")
+	private Object postProduct(@RequestBody product p) {
+		return pService.postProduct(p);
+	}
+	
+	@GetMapping("/product/get")
+	private Object getProduct() {
+		return pService.getProduct();
+	}
+	
+	@PutMapping("/product/{id}")
+	private ResponseEntity<Object> updateProduct(@PathVariable int id, @RequestBody product p){
+		return pService.updateProduct(id, p);
+	}
+	
+	@DeleteMapping("/product/{id}")
+	private ResponseEntity<Object> deleteProductById(@PathVariable int id){
+		return pService.deleteProductById(id);
+	}
+	
+	@GetMapping("/product/vendor")
+	public ResponseEntity<Object> getSimilarVendor(@RequestParam String value){
+		return pService.getSimilarVendor(value);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

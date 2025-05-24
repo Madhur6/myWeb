@@ -1,0 +1,660 @@
+// Dependency Management (pom.xml)
+
+// Define web app configuration (web.xml)
+
+// Manage Spring Beans (content.xml)
+
+// Implement non functional requirements (NFRs)
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+Understanding Spring Boot vs Spring MVC vs Spring
+
+- Spring Boot vs Spring MVC vs Spring: What's in it?
+
+  - Spring Framework: Dependency Injection
+
+    - @Component, @Autowired, @Component Scan etc..
+    
+    - Just dependency injection is not sufficient (You need other frameworks to build apps)
+
+      - Spring modules & spring projects: 
+	- Extend spring eco system
+        - Provide good integration with other frameworks (Hibernate/JPA, JUnit & Mockito for unit testing)
+
+*-------------------------------*-------------------------------*
+
+  - Spring MVC (Spring Module): Simplify building web apps and REST API
+
+    - Building web application with Struts was very complex
+    - @Controller, @RestController, @RequestMapping("/courses")
+
+*-------------------------------*-------------------------------*
+    
+  - Spring Boot (Spring Project): Build Production-Ready apps Quickly
+
+    - Starter Projects - Make it easy to build variety of applications
+    - Auto configuration - Eliminate configuration to setup Spring, Spring MVC and other frameworks!
+    - Enable non functional requirements (NFRs):
+      - Actuator: Enables Advanced Monitoring of applications
+      - Embedded server: No need for separate application servers!
+      - Logging and Error handling.
+      - Profiles and ConfigurationProperties
+
+*-------------------------------*-------------------------------*
+
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+
+
+// Setting up spring boot project: start.spring.io (spring initializer) 
+
+   - Project:    Maven project 
+   - Language:   Java language
+   - SpringBoot: 3.0.0 ( DO NOT USE "SNAPSHOT" VERSIONS )
+   - Project MetaData > Group / Artifact / Name / Description / Package Name / < Packaging: Jar > / Java: 17 (atleast)
+   
+   -  Dependencies: 
+      - Spring Web
+      - anything else you require....
+      
+   - Generate: will generate a zip file... Happy Coding 😊
+
+*-------------------------------*-------------------------------*
+
+// Importing the project:
+   - in eclipse: file > import > existing maven projects ✨
+   
+
+// After importing the project:
+   - src/main/java:      This is where our java code will go
+   - src/main/resources: This is where our application's configuration will go
+   - src/test/java:      This is where our unit tests will go
+   - pom.xml:            All the dependencies 
+   
+
+*-------------------------------*-------------------------------*
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+Application.properties: [src/main/resources]
+
+- logging.level.org.springframework=debug > "for package `org.springframework`, We want to log at `debug` level."
+                                            - Basically we will see much more logged information when we will run the spring-boot application
+ 
+- logging.level.org.springframework=trace > printing at even lower level
+
+- logging.level.org.springframework=info  > printing at higher level ( not much information * )
+
+- trace > debug > info > warning > error > off ...
+            * [debug / info / warning / error] is printed :)
+
+
+CONDITIONS EVALUATION REPORT:
+
+- Positive matches: Things that were auto-configured.
+
+- Negative matches: Things that did not got auto-configured.
+
+
+JSON conversion: Done via framework called "jacksonHttpMessageConvertersConfiguration" [bean ---> json]
+
+                 - If you return the arrayList or etc, It'll convert it into "json".
+
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+// Beans
+   - The objects that form the backbone of your application and that are managed by the Spring IoC container are called beans. A bean is an object that is instantiated, assembled, and otherwise managed by a Spring IoC (Inversion of control) container.
+
+
+
+// Rest Controller V/s Controller
+
+// @Controller                                                      @RestController
+
+This annotation is used to mark classes                             This is a specialized controller used for RESTful web services.
+as Spring MVC controllers. 
+
+Extends @Component annotation.                                      Extends @Controller annotation.
+
+Returns a view in Spring Web MVC.                                   Cannot return a view.
+
+Requires @ResponseBody for sending responses as JSON or XML.        Assumes @ResponseBody by default for sending responses as JSON or XML, eliminating the need for explicit annotations.
+
+Used for traditional MVC applications                               Used for REST APIs where JSON or XML responses are sent directly to the client.
+where views (JSP, Thymeleaf) are returned.
+
+Introduced in Spring 2.5.                                           Introduced in Spring 4.0.
+
+
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+@RequestMapping
+
+- To map requests to controllers methods
+
+- There are also HTTP method specific shortcut variants of @RequestMapping:
+
+  - @GetMapping
+
+  - @PostMapping
+
+  - @PutMapping
+
+  - @DeleteMapping
+
+  - @PatchMapping
+
+
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+
+- Tired of re-starting your server all the time
+  - Add spring-boot-devtools <But after making modification in pom.xml, Need to restart >
+
+
+- Keeping things simple 👍
+  Ex. 
+  - Let's say we have 2 environments: 1). developement
+                                      2). production
+  
+  - Creating profiles: 
+    - Copy & paste application.properties > Save as application-dev.props / application-prod.props 
+  
+  - Making use of profiles:
+    - application.properties > spring.profiles.active=prod / dev ( Whatever configuration is in app-prod.props, Has higher priority )
+    
+  
+
+- Talking to different service:
+  - We would need currency-service.url / currency-service.key / currency-service.username
+  - Create a class "currencyServiceConfiguration" & add following annotations: @ConfigurationProperties(prefix = "currency-service") / @Component: I want spring-boot to handle this [Basically spring-boot will create an instance of the class]
+  
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+- @Autowired:
+  - Also considers self references for injection (that is, references back to the bean that is currently injected).
+  
+
+
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+Deployment Approach:
+
+- Embedded server:
+  - Already part of our .jar file
+  - steps: - install java
+           - run jar file
+  
+  - maven build > clean install > copy building jar path: <>
+  
+  - cd to path in cmd & location SNAPSHOT.jar
+  - java -jar < full-name of SNAPSHOT.jar >
+
+
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+Monitor Applications using Spring Boot Actuator
+  
+- Monitor & manage your application in your production
+  
+- Provides a number of endpoints:
+  - beans:   Complete list of spring beans in your app.
+  - health:  Application health information.
+  - metrics: Application metrics.
+  - mappings:Details around Request mappings.
+   
+- spring-boot-starter-actuator <localhost:8080/actuator/*health*>
+
+- To access more information, application.properties: <management.endpoints.web.exposure.include=* or (health,metrics)>
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+Our First Web Application:
+
+- ToDO Management App
+
+- To change the server: server.port = 8081
+
+- To return a view, You need @ResponseBody annotation...
+
+- To return a HTML, create a JSP file inside this path: `/src/main/resources/META-INF/resources/WEB-INF/jsp/sayHello.jsp`
+
+- Add this dependency inside the pom.xml: 
+
+  - ```
+    <dependency>
+		<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		<scope>provided</scope>
+    </dependency>
+    ```
+
+- Modify your application.properties:
+  - spring.mvc.view.prefix=/WEB-INF/jsp/
+    spring.mvc.view.suffix=.jsp
+	logging.level.org.springframework=debug
+	
+
+- /login?name=madhur
+  - Pass 2 parameters: @RequestParam String name, ModelMap model
+  - Inside method body:model.put("name", name);
+  - Add ${name} inside .jsp page...
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+// Dispatcher Servlet
+
+- Browser -----sends HTTP request-------> Server handles the request ---------------> Server returns the Http response 
+                                            (spring boot web app)
+
+- Model I Architecture  (every logic inside the jsps)
+
+- Model II Architecture (mvc)
+
+- Model II Architecture with frontController (can contain authentication logic, which is common to every servlet)
+
+
+- Spring MVC front controller (Dispatcher Servlet):
+
+  - Receives HTTP request (Dispatcher servlet receives)
+  - Process HTTP request:
+    - identifies correct controller method: 
+      - Based on request URL
+    - Executes controller method: 
+      - Returns model and view name
+    
+    - Identifies the correct view (via our meta-inf path and app.props configuration (spring.mvc.view.prefix=/web-inf/jsp/)
+      - So the "view-resolver" maps the .jsp pages.
+      
+    - Executes the view
+    
+  - Returns HTTP response
+
+
+
+
+  
+  
+  
+  
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+// How to display views
+
+- Create a .jsp file inside this path: [/src/main/resources/META-INF/resources/WEB-INF/jsp/sayHello.jsp]
+- Inside your controller: return "jsp-file-name"
+
+
+// Can add request header as parameter
+
+- @RequestMapping(value="login", method=RequestMethod.GET)
+  
+- We use @RequestParam when we want to capture "QueryParameters" like /login?name=harry
+
+
+// ModelMap
+
+- Pass query-params to our .jsp file, Use ModelMap
+  - @RequestMapping(value="login", method=RequestMethod.GET, ModelMap model)
+  - model.put("name", name)
+  
+  
+
+  
+  
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+// What is a static block?
+
+
+A static block in Java is a special block of code that runs only once when the class is loaded into memory. 
+It is used to initialize static variables or perform one-time setup tasks.
+  
+  
+  
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+// What is session-attributes?
+
+- Details stored across multiple requests, Unlike normal-requests.
+- Details are stored on server.
+
+
+@Controller
+//@SessionAttributes("name")
+public class ToDoController {
+
+- Use it in all of the controllers, Where you want to use "name"
+- But you just need to capture it inside modal, In only one controller...
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+// Adding JSTL to Spring Boot Project and Showing Todos in a Table
+
+```
+<dependency>
+	<groupId>jakarta.servlet.jsp.jstl</groupId>
+	<artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.glassfish.web</groupId>
+    <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+</dependency>
+-----------------------------------------------------------------------
+
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
+					<c:forEach items="${todos}" var="todo">
+						<tr>
+							<td>${todo.id}</td>
+							<td>${todo.description}</td>
+							<td>${todo.targetDate}</td>
+							<td>${todo.done}</td>
+						</tr>
+					</c:forEach>
+
+```
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+// Adding Bootstrap CSS framework to Spring Boot Project using webjars
+
+```
+<dependency>
+	<groupId>org.webjars</groupId>
+	<artifactId>bootstrap</artifactId>
+	<version>5.1.3</version>
+</dependency>
+ 
+<dependency>
+	<groupId>org.webjars</groupId>
+	<artifactId>jquery</artifactId>
+	<version>3.6.0</version>
+</dependency>
+
+<link href="webjars/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" >
+<script src="webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+<script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+
+```
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+Adding Validations using Spring Boot Starter Validation
+
+1### /pom.xml Modified
+
+```
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+           
+           
+2### /Command Bean (Form Backing Object)
+     - 2-way binding (.jsp & _controller.java)
+     
+    - Instead of @RequestParams, Bind it to directly to "bean" itself...
+    - Also, Add spring form tag library...[ <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %> ]
+    - Also, <form method="post" modelAttribute="todo">, This modelAttribute binds the form with this "todo" object in controller...	[ public String addNewToDo(ToDo todo, ModelMap model) ]
+    - Also, [ Description: <form:input type="text" path="description" ... ] binds the input form to "description" variable of "todo" bean...
+    - Also, create form:input for everything, So that nothing is null...
+    
+    
+    - Adding validations, To bean:
+      - 	@Size(min=10, message="Enter atleast 10 characters")
+	        private String description;
+	        
+	        Also, add   @RequestMapping(value="add-todo", method=RequestMethod.POST)
+	                    public String addNewToDo(@Valid @ModelAttribute("todo") ToDo todo, ModelMap model) {
+	                    
+	        Also, add <form:errors path="description" cssClass="text-warning"/>
+    
+
+
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+Adding Target Date Field to Todo Page
+
+```
+<dependency>
+	<groupId>org.webjars</groupId>
+	<artifactId>bootstrap-datepicker</artifactId>
+	<version>1.9.0</version>
+</dependency>
+```
+    
+<link href="webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet">
+
+- Inside application.properties:
+  - spring.mvc.format.date=yyyy-MM-dd
+
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+Adding a Navigation Bar and Implementing JSP Fragments
+
+
+- Use .jspf (jsp fragments)
+- <%@ include file="common/footer.jspf"%>
+
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+Preparing for Spring Security
+
+- pom.xml Modified
+
+```
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+Configuring Spring Security with Custom User and Password 
+
+
+```
+@Configuration
+public class SpringSecurityConfiguration {
+	//LDAP or Database
+	//In Memory 
+	
+	//InMemoryUserDetailsManager
+	//InMemoryUserDetailsManager(UserDetails... users)
+	
+	@Bean
+	public InMemoryUserDetailsManager createUserDetailsManager() {
+		
+		Function<String, String> passwordEncoder
+				= input -> passwordEncoder().encode(input);
+		
+		UserDetails userDetails = User.builder()
+									.passwordEncoder(passwordEncoder)
+									.username("in28minutes")
+									.password("dummy")
+									.roles("USER","ADMIN")
+									.build();
+		
+		return new InMemoryUserDetailsManager(userDetails);
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+	
+}
+```
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+Refactoring and Removing Hardcoding of User Id
+
+```
+@Controller
+@SessionAttributes("name")
+public class WelcomeController {
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	public String goToWelcomPage(ModelMap model) {
+		model.put("name", "My-First-Web-App");
+		return "welcome";
+	}
+	
+	private String getLoggedinUsername() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+		return authentication.getName();
+	}
+}
+```
+                                                        
+                                                        
+                                                        
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------                                                      
+Adding Spring Boot Starter Data JPA and Getting H2 database ready
+
+### /pom.xml Modified
+
+```
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<dependency>
+	<groupId>com.h2database</groupId>
+	<artifactId>h2</artifactId>
+	<scope>runtime</scope>
+</dependency>
+```
+
+spring.datasource.url=jdbc:h2:mem:testdb
+
+
+```
+@Configuration
+public class SpringSecurityConfiguration {
+	
+	//All URLs are protected
+	//A login form is shown for unauthorized requests
+	//CSRF disable
+	//Frames
+	
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		
+		http.authorizeHttpRequests(
+				auth -> auth.anyRequest().authenticated());
+		http.formLogin(withDefaults());
+
+		http.csrf(csrf -> csrf.disable());
+		http.headers(headers -> headers.frameOptions(frameOptionsConfig-> frameOptionsConfig.disable()));
+		
+		return http.build();
+	}
+}
+```
+```
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+Making Todo an Entity and Population Todo Data into H2
+
+### /src/main/java/com/in28minutes/springboot/myfirstwebapp/todo/Todo.java Modified
+
+```
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+
+//JPA
+// Bean -> Database Table
+@Entity
+public class Todo {
+
+	@Id
+	@GeneratedValue
+	private int id;
+```
+
+
+
+When to use it:
+If you are using data.sql to insert initial records and getting errors due to missing tables (because Hibernate hasn’t created them yet), enabling this property ensures that Hibernate first creates tables, and then data.sql runs.
+
+Example Scenario:
+Without spring.jpa.defer-datasource-initialization=true:
+
+Spring Boot runs schema.sql and data.sql before Hibernate initializes the database schema.
+
+If Hibernate is set to update or create, it may lead to errors because the schema isn't ready yet.
+
+With spring.jpa.defer-datasource-initialization=true:
+
+Hibernate first initializes the schema (creating tables, constraints, etc.).
+
+Then, Spring Boot runs schema.sql and data.sql, ensuring tables already exist.
+
+
+spring.jpa.defer-datasource-initialization=true
+
+### /src/main/resources/data.sql
+
+```
+insert into todo (ID, USERNAME, DESCRIPTION, TARGET_DATE, DONE)
+values(10001,'in28minutes', 'Get AWS Certified', CURRENT_DATE(), false);
+```
+
+```
+@Repository
+public interface ToDoRepository extends JpaRepository<ToDo, Integer>{
+	
+}
+```
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------

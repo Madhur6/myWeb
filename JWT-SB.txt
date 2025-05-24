@@ -1,0 +1,728 @@
+--------------------*--------------------*--------------------*--------------------*
+#-STEP-I
+
+#Pom.xml
+
+[Make sure this dependency is used]
+-> <dependency>
+	spring-boot-starter-secuirty	
+   </>
+
+[ Keep the similar version ]
+-> <dependency> # API-MODULE
+	jjwt-api
+   </>
+```
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.11.5</version>
+</dependency>
+```
+
+-> <dependency> # Implementation-MODULE
+	jwt-impl	
+   </>
+```
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-impl</artifactId>
+    <version>0.11.5</version>
+</dependency>
+```
+
+-> <dependency> # Jackson-INTEGRATION
+	jjwt-jackson or ** jjwt-gson [Gson is preffered] **
+   </>
+```
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-jackson</artifactId>
+    <version>0.11.5</version>
+</dependency>
+```
+
+[For JWTs to work smoothly with JSON objects (which they inherently are), 
+This module integrates Jackson into the mix, allowing 
+seamless conversion between JWTs and JSON.]
+
+
+#application.properties:
+
+spring.security.user.name=harry
+spring.security.user.password=harry
+--------------------*--------------------*--------------------*--------------------*
+OR with Code
+
+#config package:
+   
+   @Configuration
+   public class AppConfig {
+	@Bean
+	public UserDetailsService userDetailsService(){
+		UserDetailsService user1 = User.builder().username("harry").password(passwordEncoder().encode("123")).roles("ADMIN").build();
+		UserDetailsService user2 = User.builder().username("ron").password(passwordEncoder().encode("321")).roles("ADMIN").build();
+		return InMemoryUserDetailsManager(user1, user2);
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder(){
+		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) throws {
+		return builder.getAuthenticationManager();
+	}
+   }
+
+--------------------*--------------------*--------------------*--------------------*
+
+
+
+
+
+
+
+
+- We define "SpringSecurity / SecurityFilterChain" inside HttpSecurity
+
+- This JwtFilter will come into action when there will be a request coming with a `Header` called as "JWT". Header: {"Authorization":"Bearer_token_value"}
+
+- Whenever a request comes, We analyze that particular end-point & We need "AuthenticationManager" to confirm whether the Username & password exists in the database.
+
+
+					     HttpSecurity[FilterChain --> HttpSecurity.build()]
+	    					^
+						|
+						|
+ [Header->JWT]					|
+-Request---> [DispatcherServlet] -------> [SpringSecurity/SecurityFilterChain] --------> [Controller]
+
+		          | [UsernamePassword|	             |[CSRFFilter]|
+			  | Authentication   |	   	     |		  |
+			  | Filter]          |   [JwtFilter] |		  |
+				        (Chain of Responsibility)
+						     |
+						     |
+						     v
+				 JwtUtil / JwtHelper / JwtAuthentication ()
+
+
+- UsernamePasswordAuthenticationFilter (Default FilterChain By SB):  
+- JwtFilter (aka JwtAuthFilter / JwtAuthenticationFilter): We add our custom filter in front-of "Default-Filter", 
+							   & we want our filter to be present in the beginning, The very first controller,
+  -> JwtFilter, Extracts the token & performs the necessary operations.
+
+  -> Class: 
+	1). JwtUtil(JwtHelper / JwtService) [To generate the token / Validate the token / Extract information(Expiration) from token]
+
+
+
+- Additional Beans (Not part of this above core-framework But required by "Spring-Security"):
+
+	- UserDetails		: User & Password
+	- UserDetailsService	: Service Layer (To manipulate the user)
+	- PasswordEncoder	: Hashing the password
+	- AuthenticationManager : Handle the public-End-Point [It uses AuthenticationProvider further]
+	- AuthenticationProvider: Used by AuthManager
+
+
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+
+Packages:
+- model
+- service    [To implement UserDetailService]
+- repository [Interact with DB & Create the User]
+- security   [To update my SecurityFilterChain & Create JWTUtil / AuthenticationFilter]
+- config     [To implement additional beans (AuthenticationManager etc...)]
+- controller
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+
+- model:
+
+- User.java
+
+```Java
+
+@Entity
+@Table(name="my_user")
+public class User implements UserDetails {
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private int id;
+	@Column
+	private String email;
+	@Column
+	private String pass;
+
+	Constructor & Getter-Setters...
+	
+	@OneToOne(fetch= FetchType.EAGER)
+	@JoinColumn(name="role_id", referencedColumnName="id")
+	private Role role;
+	
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities(){
+		HashSet<GrantedAuthority> roleSet = new HashSet<>();
+		roleSet.add(new SimpleGrantedAuthority(this.role.getRoleName()));
+		
+		// return Set.of(new SimpleGrantedAuthority(this.role.getRoleName()));
+	}
+
+	// IF USING SB V-2
+	// SOME MORE UNIMPLEMENTED METHOD --> return true in all of them...
+}
+
+
+@Entity
+@Table(name="role")
+public class Role {
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private int id;
+
+	@Column(name="role_name")
+	private String roleName;
+
+	Constructor & Getter-Setters & toString...
+
+}
+
+```
+
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+# JPA Layer (Repsitory)
+
+- Configuer app.props.
+- spring.datasource.url=jdbc:h2:mem:testdb
+- spring.datasource.username=
+- spring.datasource.password=
+- spring.datasource.driver-class-name=org.h2.Driver
+
+#jpa
+- spring.jpa.database=H2
+
+# dialect: dependency > hibernate-core > org.hibernate > org.hibernate.dialect > H2Dialect.class --> Copy the qualified name & paste it below
+
+- spring.jpa.database-platform=org.hibernate.dialect.H2Dialect [without .class extension]
+- spring.jpa.show-sql=true
+
+
+public interface UserRepo extends JpaRepository<User, Integer> {
+	Optional<User> findByEmail(String email);
+}
+
+
+@Column(unique=true)
+private String email;
+
+@Repository
+public interface RoleRepo extends JpaRepository<Role, Integer> {
+
+}
+
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+
+
+- Since we have used this following structure ["public class User implements UserDetails "], This "User" is already identified by the spring-framework
+
+- Now SB have given a "service-layer-implementation" as an Interface readymade called "UserDetailsService". [To interact with "UserDetails"]
+
+- so public class UserService implements UserDetailsService...
+
+- Contains a single method: LoadUserByUsername()
+
+#Approach I
+
+```Java
+
+@Service
+public class UserService implements UserDetailsService {
+	@Autowired
+	UserRepo userRepo;
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return userRepo.findByEmail(username).orElseThrow(() -> new
+					UsernameNotFoundException("User is not found!"));
+	}
+}
+
+```
+
+Q. Another way of creating a bean? -> Use @Bean...
+
+Q. Interface with only one method? -> FunctionInteface (UserDetailsService ->	loadUserByUsername())
+
+
+#Approach II
+
+```
+@Configuration
+public class ApplicationConfig {
+	@Autowired
+	UserRepo userRepo;
+
+	@Bean
+	UserDetailsService userDetailsService() {
+		return username -> userRepo.findByEmail(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User is not found!"));
+	}
+}
+
+// COMMENT THIS OUT IF USING "APPROACH I"
+
+```
+
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+
+# JWTUTIL (NOW WE START WITH JWT IMPLEMENTATION)
+
+INSIDE UTIL PKG
+
+--> NEVER USER's PASSWORD & ROLE IN THE TOKEN'S PAYLOAD.
+
+-> 
+
+```Java
+
+@SuppressWarnings("deprecation")
+public class JwtUtil {
+	
+	//@Autowired
+	//UserDetailsService userDetailsService;
+	
+	private final static String SECRET_KEY = "ThisIsASecretKeyThisIsASecretKeyThisIsASecretKey"; // >= 256 bits
+	
+
+	private final static long EXPIRATION = 	 24 * 60 * 60 * 1000L;
+
+	// *-----------------------------------*-----------------------------------* DECODING / PARSING *-----------------------------------*-----------------------------------*-----------------------------------*-----------------------------------*-----------------------------------*-----------------------------------
+
+
+
+
+	// Each key in JWT payload is called as "Claim"
+	public Claims extractAllClaims(String token){
+		return Jwts.parser().setSigningKey(SECRET_KEY).build().parseClaimsJws(token).getBody(); // It might be "deprecated", But no worries...
+	}
+
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+	Jwsts (service) --> to extract, We use parser() --> set the secret key --> Use "build()" to build the parser -->
+
+	--> Now we will use parseClaimsJws(token) to parse the "claims" ----> This will return me: Header | Payload | Signature
+	--> But i require only the body, So we use --> getBody();
+	--> return the entire expression.
+	--> Don't worry about "deprecated" methods
+	--> We will add "@SuppressWarnings("deprecation")" to suppress the warnings.
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+
+
+
+	public String extractUsername(String token){
+		Claims claims = extractAllClaims(token);
+		return claims.getSubject();
+	}
+
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+	To extract the username quickly, We create this above Utility-function to extract the Username.
+	--> Call "extractAllClaims()" & extract the subject from it.
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+
+
+
+	public Date extractExpiry(String token){
+		Claims claims = extractAllClaims(token);
+		return claims.getExpiraion();	
+	}
+
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+	To extract the expiry quickly, We create this above Utility-function to extract the Username.
+	--> Call "extractAllClaims()" & extract the expiry from it.
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+
+
+
+
+
+	// *-----------------------------------*-----------------------------------* ENCODING / GENERATION *-----------------------------------*-----------------------------------*-----------------------------------*-----------------------------------*-----------------------------------*-----------------------------------
+	
+
+
+
+
+	public String generateToken(UserDetails user){
+		return Jwts.builder().signWith(SignatureAlgorithmHS256, SECRET_KEY).addClaims(new HashMap<>())
+
+                                     .setSubject(user.getUsername()).setIssuedAt(new Date(System.currentTimeMillis()))
+
+                	             .setExpiration(new Date(System.currentTimeMillis()+EXPIRATION)).compact();  // It might be "deprecated", But no worries...
+
+	}
+
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+	To generate the token, We create this above function
+	--> We will use Jwtservice & build it,
+	--> We need to sign it with 256 encryption algorithm.
+	--> Since "default-claims" are good enough, We won't add any "custom-claims", So we add "empty-Hash-Map". [ addClaims(new HashMap<>()) ]
+	--> Now i need to set the "subject" --> setSubject(user.getUsername())
+	--> Also set "issuedAtDate" as your current data.
+	--> Now set the expiry ---> System's current datetime + EXPIRATION variable. [ Need to use compact() --> Because we don't need the entire JSON, Just the small string ]
+	--> Now we return it.
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+
+
+
+
+	// VALIDATION
+	public boolean validateToken(String token, UserDetails user){[We could've used UserDetailsService injection as well here, Then make a call to DB to check whether user exist or not]
+		String username = extractUsername(token);
+		Date expiry = extractExpiry(token);
+		return (username.equals(user.getUsername()) && expiry.after(new Date(System.currentTimeMillis())));
+	}
+
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+	To validate the token, We create this above function:
+	--> We pass Token(which we want to validate) & User(against which we want to validate this token) as paramters
+	--> Extract the "Username" & "Expiry" from token via our "utility-functions"
+	--> Now we compare these, [expiry should be after the current-time, Meaning if expiration is not after the current-time, Then it means
+					expiry date have passed the current-time.]
+	--> Now we return it.
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+
+
+
+	// For testing our above-functions...
+	public static void main(String[] args){
+		UserDetails user = new User("arbaz", "123", Set.of(new SimpleGrantedAuthority("ADMIN"))); // Create a custom-user		
+		
+		// FOR TESTING
+		JwtUtil jwtUtil = new JwtUtil();
+		jwtUtil token = jwtUtil.generateToken(user);
+		System.err.println("Token - " + jwtUtil.extractUsername(token)); 
+	 	System.err.println("Token - " + jwtUtil.extractExpiry(token));
+		System.err.println("Token - " + jwtUtil.validateToken(token, user)); // Token & Username should match...
+	}
+
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+	To test whether our functions are working correctly:
+	--> Create a custom-user, Pass Set.of() as "simpleGrantedAuthority as ADMIN" 
+	--> Create the object of jwtUtil: Generate the token | extract User | extract Expiry | Call validateToken(token, user)
+	--> Log everything & run it.😀
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+
+
+}
+
+```
+
+
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+
+If spring-boot version 2 comes:
+
+-> jakarta --> javax
+-> Set.of  --> HashSet<GrantedAuthority> roleSet = new HashSet<>(); | roleSet.add(new SimplGrantedAuthority(this.role.getRoleame())); | return roleSet;
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+
+
+# JwtFilter [JsonWebToken dependency is required & important]
+
+- security package
+
+@Component
+public class JwtAuthenticationFilter  extends OncePerRequestFilter {
+
+	@Autowired
+	JwtUtil jwtUtil;
+
+	@Autowired	
+	UserDetailsService userDetailsService;
+	
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		// Extract the authentication header
+		// request.getHeader("JWT"); or below [Here "JWT" or "Authorization" is a Key in our token's objects]
+		String authHeader = request.getHeader("Authorization");
+
+		// If the "header" of our token, Doesn't contain the "Bearer"...
+		if ((authHeader == null || !authHeader.startsWith("Bearer ")){
+
+			// proceed with remaining filter
+			filterChain.doFilter(request, response);
+
+			return;
+		}
+
+		// Jwt purpose
+		
+		String JwtToken = authHeader.substring(7);
+		
+		// Extract username
+		String username = jwtUtil.extractUsername(jwtToken);
+		
+		// getContext() is like a current-snap-shot*
+		if ((username!=null) && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+			// if null, Then get the user from DB
+
+			userDetails userDB = userDetailsService.loadUserByUsername(username);
+
+			if (userDB != null && jwtUtil.validateToken(jwtToken, userDB)) {
+				// Register the current-user with security-context                                           // username password 
+				UsernamePasswordAutheticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDB, null, userDB.getAuthorities());
+				
+				// To update the snap-shot
+				authenticationToken.setDetails(new WebAuthenticationDetails(request));
+
+				// Update my user as valid-user
+				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+				
+			}
+		}
+
+		// Continue filter chain
+		filterChain.doFilter(request, response);
+				
+		
+	}
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+	 My JwtFilterChain will only process request with a header that has "Bearer token_value"
+
+	-> Each "_secured_spring_application_" maintains a Data-Structure [A HashMap<>()]
+
+	-> HashMap<>{	______________________
+			| "userI" | "userII" |
+		}	----------------------
+
+	-> Class that handles all these above things is called: 
+			`SecurityContextHolder` ---------------> UsernamePasswordAuthenticationToken
+
+	-> trying to login ---creates `UsernamePasswordAuthenticationToken`---> update 
+								the HashMap by calling `SecurityContextHolder.setAuthentication(Token)` 
+	//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+
+}
+
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+
+# Some Mandatory Beans
+
+# To hanlde some `public-end-points` > ```AuthenticationManager & AuthenticationProvider```
+
+-->  config package
+
+@Configuration
+public class ApplicationConfig {
+
+	// Method - I------------*-----------*-----------*-----------*-----------*-----------*-----------*
+	@Autowired
+	UserDetailsService userDetailsService;
+
+	@Bean
+	@SuppressWarnings("deprecation")
+	PasswordEncoder encoder(){
+		return NoOpPasswordEncoder.getInstance();		
+	}
+	
+	@Bean
+	AuthenticationProvider authenticationProvider(){
+	
+		// type cntrl + t > Use DAO
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setPasswordEncoder(encoder());
+		
+		authProvider.setUserDetailsService(userDetailsService); // Using the @Autowired injected object
+
+		return authenticationProvider();
+	}
+
+
+
+	// Method - II------------*-----------*-----------*-----------*-----------*-----------*-----------*
+	@Autowired
+	UserRepo userRepo;
+
+	@Bean
+	UserDetailsService userDetailsService(){
+		return username -> userRepo.findByEmail(username)
+					.orElseThrow(() -> new UsernameNotFoundException("User is not found."));
+	}
+
+
+
+	@Bean
+	PasswordEncoder encoder(){
+		return NoOpPasswordEncoder.getInstance();		
+	}
+	
+	@Bean
+	AuthenticationProvider authenticationProvider(){
+	
+		// type cntrl + t > Use DAO
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setPasswordEncoder(encoder());
+		
+		authProvider.setUserDetailsService(userDetailsService()); // Calling the method itself here 😁
+		
+		//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+		It needs to call the database, But how?
+		--> This class is implemented via spring, And our "UserRepo" is a custom-class.
+		--> It needs something that is understood by "spring-framework"
+
+		--> So for that we have created "UserDetailsService"
+		--> @AutoWired UserDetailsService userDetailsService
+
+		//*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+
+
+		return authProvider;
+		
+	}
+
+	// ------------*-----------*-----------*-----------*-----------*-----------*-----------*------------*
+
+
+	// WE NEED TO CREATE ```AUTHENTICATION MANAGER``` THAT INTERNALLY USES THIS ABOVE ```AUTHENTICATION-PROVIDER```
+
+	@Bean
+	AuthenticationManager authenticationManager(@Autowired [for SB<2] AuthenticationConfiguration configuration) throws Exception {
+		return configuration.getAuthenticationManager(); // Internally SB framework will register "Authentication-Provider" with this "Authentication-Manager"
+	}
+}
+
+
+
+
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+
+# Adding/Register Our Custom ```JwtFilter``` to original JWT-FILTER-CHAIN
+
+INSIDE SECURITY PACKAGE
+
+# SecurityConfig / AppSecurityConfig 
+
+   @Configuration
+-> public class SecurityConfig {
+
+	@Autowired
+	JwtAuthenticationFilter authenticationFilter; // I need to keep this custom-filter in front, Before SB default filter: UsernamePasswordAuthenticationFilter
+	
+	@Autowired
+	AuthenticationProvider authProvider;
+
+	private final String WHITE_LIST_URL= {"/login"};
+
+	@Bean
+	SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+
+		// Step I: We need to disable the .csrf [Otherwise, Our request will accept this ".csrf" token along with other tokens in Header]
+		httpSecurity.csrf(csrf -> csrf.disable());
+		
+		// Step II: [Purpose of JWT: We are not storing for how long the user was logged-in, Basically we are not storing `cookies`]
+		// Change the session-management policy
+		httpSecurity.sessionManagement(
+				sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+		// Step III: Register our "custom-filter-chain"
+		httpSecurity.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+		// Step Iv: Register 
+		// Public-Handler [AuthenticationProvider handles this]
+
+		httpSecurity.authenticationProvider(authProvider);
+		
+		
+		// Protected-Resources
+		httpSecurity.authorizeHttpRequests(httConfig -> {
+							httpConfig.requestMatchers(WHITE_LIST_URL).permitAll().anyRequest().authenticated();
+		});
+		
+		return httpSecurity.build();
+	}
+   }
+
+   
+
+
+*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------*-----------------------------
+
+# Inside config package:
+
+# AppRunner Class : To create some users
+
+* 2 Interfaces are available: 
+	- ApplicationRunner : This accepts ApplicationArguments as object. 
+	- CommandLineRunner : This accepts String array: String.. args.
+
+
+@Component
+public class AppRunner implements ApplicationRunner {
+	
+	@Autowired
+	RoleRepo roleRepo;
+
+	@Autowired
+	UserRepo userRepo;	
+
+	
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		Role role1 = new Role();
+		role1.setRoleName("ADMIN");
+
+		Role role2 = new Role();
+		role2.setRoleName("USER");
+
+		Role saveRole1 = roleRepo.save(role1);
+		Role saveRole2 = roleRepo.save(role2);
+
+		User user = new User();
+		user.setEmail("harry@gmail.com");
+		user.setPass("123");
+		user.setRole(saveRole1); // Always use "persistence-entity" as reference
+		
+
+		User user2 = new User();
+		user.setEmail("ron@gmail.com");
+		user.setPass("456");
+		user.setRole(saveRole2);
+
+
+		User user3 = new User();
+		user.setEmail("hermionne@gmail.com");
+		user.setPass("abc");
+		user.setRole(saveRole2);
+
+
+		userRepo.save(user);
+		userRepo.save(user2);
+		userRepo.save(user3);
+
+	}
+}
+
+
+--> NOW RUN THE SPRING-BOOT APPLICATION:
+	--> 
+
+
+
+
+
+
+
+
+
+
+

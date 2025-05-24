@@ -1,0 +1,1 @@
+insert into TO_DO(ID, USERNAME, TASK_NAME, DESCRIPTION, DATE, DONE) values(101, 'practice', 'learning', 'learning spring boot', CURRENT_DATE(), false);

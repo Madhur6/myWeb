@@ -1,0 +1,221 @@
+# Madhur's Cheat Sheet for Spring-Boot interview preparation 😉💡
+
+- --------------------------------------------✨ INTERVIEW Qs ✨---------------------------------------------------
+					<< LET'S START LEARNING 😊 >>
+
+
+
+- ------------------------------------------< BASIC SPRING-BOOT > ------------------------------------
+
+- ----------------------------------------------✨ SET-I ✨-------------------------------------------
+
+
+Q. Hermionne's team is building a REST API that should return JSON responses. 
+   What annotation should he use to ensure proper serialization of response data?
+ A) @RestController
+ B) @Controller
+ C) @RequestParam
+ D) @Service
+
+
+
+Q. Harry wants to create a REST endpoint that accepts JSON input and maps it 
+   to a Java object automatically. Which annotation should he use?
+ A) @RequestBody
+ B) @PathVariable
+ C) @RequestParam
+ D) @ResponseBody
+
+
+
+Q. padma is debugging a Spring Boot application and wants to enable detailed SQL 
+   logs. What should she add to application.properties?
+ A) spring.jpa.show-sql=true
+ B) spring.logging.level=DEBUG
+ C) spring.debug.sql=true
+ D) spring.datasource.log-statements=true
+
+
+
+Q. Draco's Spring Boot application should automatically restart when file 
+   changes are detected in the development environment. How can he achieve 
+   this?
+ A) Use spring-boot-devtools
+ B) Manually restart the server every time
+ C) Enable spring.reload.enabled=true in application.properties
+ D) Use a shell script to watch for file changes
+
+
+
+Q. Ron wants to define an API that handles both GET and POST requests for 
+   the same URL in her Spring Boot application. What should she do?
+ A) Use @RequestMapping(value = "/api", method = {RequestMethod.GET, 
+RequestMethod.POST})
+ B) Create separate methods with @GetMapping("/api") and @PostMapping("/api")
+ C) Use @RequestParam to di erentiate between GET and POST requests
+ D) Override the doGet() and doPost() methods manually
+
+
+
+Q.  What is the issue with this Spring Boot entity class?
+ @Entity  
+public class Product {  
+private Long id;  
+private String name;  
+// Getters and setters  
+}  
+A. Missing @Id on the id field
+ B. Missing @Column on name
+ C. Missing @Entity annotation
+ D. No issues
+
+
+
+Q. What is the issue with this REST controller?
+   @RestController  
+   public class UserController {  
+        private UserService userService;  
+        public UserController(UserService userService) {  
+                this.userService = userService;  
+        }  
+   }  
+ A. Missing @Autowired on the constructor
+ B. Missing @GetMapping
+ C. UserService is not a bean
+ D. No issues
+
+
+
+
+Q. What is wrong with this REST endpoint?
+    @RestController
+    public class ProductController {
+        @PostMapping("/products")
+          public void addProduct(Product product) { }
+    }
+ A. Missing @RequestBody
+ B. Missing @Autowired
+ C. Missing @Entity on Product
+ D. Nothing is wrong
+
+
+
+Q.  What is wrong with this @Entity setup?
+ @Entity
+ public class User {
+ private String name;
+ }
+ A. Missing @Id field
+ B. @Table is required
+ C. @Column is required
+ D. Nothing is wrong
+
+
+
+Q. What annotation marks a Spring Boot application’s main class?
+ A. @SpringBootApplication
+ B. @SpringApplication
+ C. @EnableAutoConfiguration
+ D. @Main
+
+
+Q.  Which annotation injects dependencies by constructor?
+ A. @Inject
+ B. @Autowired
+ C. @Resource
+ D. @Component
+
+
+
+Q. Which HTTP method performs a CRUD update?
+ A. POST
+ B. PUT
+ C. GET
+ D. DELETE
+
+
+
+Q. What is the default port for Spring Boot?
+ A. 8080
+ B. 8000
+ C. 8443
+ D. 9090
+
+
+
+Q. Which annotation maps POST requests?
+ A. @PostMapping
+ B. @RequestMapping(method = POST)
+ C. Both A and B
+ D. @PUT
+
+
+
+Q. What is the purpose of @RequestParam?
+ A. Binds HTTP request parameters to method arguments
+ B. Validates request bodies
+ C. Maps path variables
+ D. Reads HTTP headers
+
+
+
+Q. What does @SpringBootApplication combine?
+ A. @Configuration, @EnableAutoConfiguration, @ComponentScan
+ B. @Controller, @Service, @Repository
+ C. @Spring, @Boot, @App
+ D. @Bean, @Inject, @Autowired
+
+
+
+Q. What is the purpose of @RequestBody?
+ A. Binds HTTP request body to a method parameter
+ B. Validates request headers
+ C. Maps URL parameters
+ D. Reads query strings
+
+
+
+Q. Which HTTP method is idempotent?
+ A. GET
+ B. POST
+ C. PATCH
+ D. DELETE
+
+
+Q. Which annotation maps HTTP DELETE requests?
+ A. @DeleteMapping
+ B. @RemoveMapping
+ C. @RequestMapping(method = DELETE)
+ D. Both A and C
+
+
+
+Q. Which HTTP status indicates a successful POST request?
+ A. 201
+ B. 200
+ C. 204
+ D. 202
+
+
+Q. Which HTTP method is non-idempotent?
+ A. POST
+ B. GET
+ C. PUT
+ D. DELETE
+
+
+
+Q. What does @GeneratedValue do in JPA?
+ A. Configures automatic ID generation
+ B. Validates field values
+ C. Maps generated columns
+ D. Skips ID checks
+
+
+
+
+
+
+
+
+- --------------------------------------------⭐SET-I ENDS⭐--------------------------------------------

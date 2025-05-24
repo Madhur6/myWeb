@@ -6,6 +6,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+
+// sql ---> oops concepts ---> // orm (object relational mapping)
+
+// Entity & Repository 
+
+// client (frontend) ---request for login---> controller -----> service (business logic) ----> repository ---> JPA (Abstraction) | ---> DB
+
 @Entity
 @Table(name = "app_user")
 public class User {
@@ -37,3 +44,12 @@ public class User {
     
     
 }
+
+// Student table
+
+//    age           name
+// 1| 12            madhur
+// 2| 20            vansh
+// 3| 21            maria
+
+

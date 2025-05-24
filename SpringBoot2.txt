@@ -1,0 +1,699 @@
+model: todo
+controller: todoController
+service: todoService
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+// Setting up spring boot project: start.spring.io (spring initializer) 
+   - Project:    Maven project 
+   - Language:   Java language
+   - SpringBoot: 3.0.0 ( DO NOT USE "SNAPSHOT" VERSIONS )
+   - Project MetaData > Group / Artifact / Name / Description / Package Name / < Packaging: Jar > / Java: 17 (atleast)
+   
+   -  Dependencies: 
+      - Spring Web
+      - anything else you require....
+      
+   - Generate: will generate a zip file... Happy Coding 😊
+   
+
+// Importing the project:
+   - in eclipse: file > import > existing maven projects ✨
+   
+
+// After importing the project:
+   - src/main/java:      This is where our java code will go
+   - src/main/resources: This is where our application's configuration will go
+   - src/test/java:      This is where our unit tests will go
+   - pom.xml:            All the dependencies 
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+@Controller                                                         @RestController
+
+This annotation is used to mark classes                             This is a specialized controller used for RESTful web services.
+as Spring MVC controllers. 
+
+Extends @Component annotation.                                      Extends @Controller annotation.
+
+Returns a view in Spring Web MVC.                                   Cannot return a view.
+
+Requires @ResponseBody for sending responses as JSON or XML.        Assumes @ResponseBody by default for sending responses as JSON or XML, eliminating the need for explicit annotations.
+
+Used for traditional MVC applications                               Used for REST APIs where JSON or XML responses are sent directly to the client.
+where views (JSP, Thymeleaf) are returned.
+
+Introduced in Spring 2.5.                                           Introduced in Spring 4.0.
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+- @Autowired:
+  - Also considers self references for injection (that is, references back to the bean that is currently injected).
+  
+  
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+@RequestMapping
+
+- To map requests to controllers methods
+
+- There are also HTTP method specific shortcut variants of @RequestMapping:
+
+  - @GetMapping
+
+  - @PostMapping
+
+  - @PutMapping
+
+  - @DeleteMapping
+
+  - @PatchMapping
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+- Tired of re-starting your server all the time
+  - Add spring-boot-devtools <But after making modification in pom.xml, Need to restart >
+
+
+
+*-------------------------------*-------------------------------*-------------------------------*-------------------------------
+
+- Keeping things simple 👍
+  Ex. 
+  - Let's say we have 2 environments: 1). developement
+                                      2). production
+  
+  - Creating profiles: 
+    - Copy & paste application.properties > Save as application-dev.props / application-prod.props 
+  
+  - Making use of profiles:
+    - application.properties > spring.profiles.active=prod / dev ( Whatever configuration is in app-prod.props, Has higher priority )
+    
+  
+
+- Talking to different service:
+  - We would need currency-service.url / currency-service.key / currency-service.username
+  - Create a class "currencyServiceConfiguration" & add following annotations: @ConfigurationProperties(prefix = "currency-service") / 
+  - @Component: I want spring-boot to handle this [Basically spring-boot will create an instance of the class]
+  
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+ 
+- Embedded server:
+  - Already part of our .jar file
+  - steps: - install java
+           - run jar file
+  
+  - maven build > clean install > copy building jar path: <>
+  
+  - cd to path in cmd & location SNAPSHOT.jar
+  - java -jar < full-name of SNAPSHOT.jar >
+
+
+- Add this dependency inside the pom.xml: 
+
+  - ```
+    <dependency>
+		<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		<scope>provided</scope>
+    </dependency>
+    ```
+
+
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+- Modify your application.properties:
+  - spring.mvc.view.prefix=/WEB-INF/jsp/
+    spring.mvc.view.suffix=.jsp
+	logging.level.org.springframework=debug
+
+
+// What is a static block?
+- A static block in Java is a special block of code that runs only once when the class is loaded into memory. 
+  It is used to initialize static variables or perform one-time setup tasks.
+  
+	
+	
+// What is session-attributes?
+- Details stored across multiple requests, Unlike normal-requests.
+- Details are stored on server.
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+
+- To change the server: server.port = 8081
+
+- To return a view, You need @ResponseBody annotation...
+
+- To return a HTML, create a JSP file inside this path: `/src/main/resources/META-INF/resources/WEB-INF/jsp/sayHello.jsp`
+
+
+
+
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+/*
+ ============================================================================
+ 🧠 Login Controller Cheat Sheet - Summary
+ ============================================================================
+ Package:
+     com.prac.myPrac.controller
+
+ Purpose:
+     - Handles login functionality
+     - Uses GET to display login page
+     - Uses POST to process login form
+     - Uses AuthenticationService for validation
+     - Stores username in session using @SessionAttributes
+
+ ----------------------------------------------------------------------------
+ 🔧 Annotations:
+ ----------------------------------------------------------------------------
+ @Controller                 --> Marks class as Spring MVC Controller
+ @SessionAttributes("name")  --> Stores 'name' in session scope
+ @Autowired                  --> Injects AuthenticationService bean
+ @RequestMapping             --> Maps HTTP requests to methods
+
+ ----------------------------------------------------------------------------
+ ✅ GET Request (Display login page):
+ ----------------------------------------------------------------------------
+ @RequestMapping(value="login2", method=RequestMethod.GET)
+ public String goToLoginPage() {
+     return "login";  // Returns login.jsp/html
+ }
+
+ ----------------------------------------------------------------------------
+ ✅ POST Request (Process form):
+ ----------------------------------------------------------------------------
+ @RequestMapping(value="login2", method=RequestMethod.POST)
+ public String goToWelcomePage(@RequestParam String name,
+                               @RequestParam String password,
+                               ModelMap model) {
+     if (authenticationService.authenticate(name, password)) {
+         model.put("name", name);          // Save name to session
+         model.put("password", password);  // For demo purposes only (not secure)
+         return "welcome";                 // Returns welcome.jsp/html
+     }
+     return "login";  // Return to login if authentication fails
+ }
+
+ ----------------------------------------------------------------------------
+ 🔐 AuthenticationService:
+ ----------------------------------------------------------------------------
+ @Autowired
+ private AuthenticationService authenticationService;
+
+ // Constructor-based injection
+ public loginController(AuthenticationService authenticationService) {
+ 	 super();
+     this.authenticationService = authenticationService;
+ }
+ 
+ 
+ 
+ ```AuthenticationService
+ 
+ 	public boolean authenticate(String name, String password) {
+		boolean isValidName = name.equalsIgnoreCase(name);
+		boolean isValidPassword = password.equalsIgnoreCase(password);
+		
+		return isValidName && isValidPassword;
+	}
+ 
+ ```
+
+ ----------------------------------------------------------------------------
+ 🧾 View Mapping:
+ ----------------------------------------------------------------------------
+ login.jsp      --> shown on GET or failed login
+ welcome.jsp    --> shown on successful login
+
+ ----------------------------------------------------------------------------
+ ⚠️ Notes:
+ ----------------------------------------------------------------------------
+ - Do NOT log or store passwords in production apps
+ - Use hashing (e.g., BCrypt) to secure user passwords
+ - Logging user credentials is unsafe!
+*/
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+- Adding JSTL to jsp pages
+
+```
+<dependency>
+	<groupId>jakarta.servlet.jsp.jstl</groupId>
+	<artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.glassfish.web</groupId>
+    <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+</dependency>
+```
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+1. Directive Tags
+	These tags provide global information about the JSP page to the container (like page settings, imports, etc.)
+
+	Syntax: <%@ directive attribute="value" %>
+	
+2. Scriptlet Tags
+	Used to embed Java code directly into the JSP file.
+
+	Syntax: <% Java code %>
+	
+3. Expression Tags
+	Used to output the result of a Java expression to the client.
+
+	Syntax: <%= expression %>
+	
+4. Declaration Tags
+	Used to declare variables and methods that can be used later in the JSP page.
+
+	Syntax: <%! declaration %>
+	
+	
+5. Action Tags
+	Predefined XML tags that control the behavior of the JSP engine.
+
+	Examples:
+		<jsp:include> – Includes a file at runtime
+		<jsp:forward> – Forwards request to another resource
+		<jsp:param> – Passes parameters
+		<jsp:useBean> – Instantiates or accesses a JavaBean
+		<jsp:setProperty> / <jsp:getProperty> – Sets or gets bean properties
+		
+		
+6. Custom Tags
+	These are user-defined tags or tags from tag libraries like JSTL (Java Standard Tag Library).
+	
+	Example using JSTL:
+	```jsp
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+		<c:if test="${user.loggedIn}">
+   			Welcome, ${user.name}!
+		</c:if>
+	```
+	
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+# CREATING A SIMPLE TO-DO WEB-APPLICATION
+
+# 1. Create a model ToDO
+	Add @Entity / @Id / @GeneratedValue(strategy=GenerationType.AUTO) ...
+	
+# 2. Create a Service ToDo:
+	Add @Service annotation...
+	
+# 3. Create a controller ToDo:
+	Add @Controller annotation...
+
+```
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
+<c:forEach items="${todos}" var="todo">
+	<tr>
+		<td>${todo.id}</td>
+		<td>${todo.description}</td>
+		<td>${todo.targetDate}</td>
+		<td>${todo.done}</td>
+	</tr>
+</c:forEach>
+
+<a href="add-todo" class="btn">add</a>
+
+```
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+// Adding Bootstrap CSS framework to Spring Boot Project using webjars
+
+```
+<dependency>
+	<groupId>org.webjars</groupId>
+	<artifactId>bootstrap</artifactId>
+	<version>5.1.3</version>
+</dependency>
+ 
+<dependency>
+	<groupId>org.webjars</groupId>
+	<artifactId>jquery</artifactId>
+	<version>3.6.0</version>
+</dependency>
+
+<link href="webjars/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" >
+<script src="webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+<script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+
+```
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+- Adding Validation in 2-way binding (.jsp & _controller.java)
+
+```
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+
+- Adding validations, To bean:
+  - @Size(min=10, message="Enter atleast 10 characters")
+    private String description;
+*----------------------------*----------------------------*----------------------------
+
+- Adding form:
+  - <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+*----------------------------*----------------------------*----------------------------
+
+```
+<form:form method="post" modelAttribute="todo">
+	<fieldset class="mb-3">
+		<form:label path="description"> description </form:label>
+		<form:input type="text" path="description" required="required"/>
+		<form:errors path="description" cssClass="text-warning"/>
+	</fieldset>
+</form:form>
+```
+*----------------------------*----------------------------*----------------------------
+
+- Instead of @RequestParams, Bind it to directly to "bean" itself...
+*----------------------------*----------------------------*----------------------------
+
+- Also, Add spring form tag library...
+  [ <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %> ]
+*----------------------------*----------------------------*----------------------------
+
+- Also, 
+  [ <form method="post" modelAttribute="todo"> ] -> This modelAttribute binds the form with this "todo" object in controller...	[ public String addNewToDo(ToDo todo, ModelMap model) ]
+*----------------------------*----------------------------*----------------------------
+
+- Also,
+  [ Description: <form:input type="text" path="description" ... ] -> binds the input form to "description" variable of "todo" bean...
+*----------------------------*----------------------------*---------------------------- 
+
+- Also, 
+  create form:input for everything, So that nothing is null...
+  & add empty todo object inside your get method of "getToDo"
+  
+  ```
+	@RequestMapping(value="add-todo", method=RequestMethod.GET)
+	public String getAddToDo(ModelMap model) {
+		ToDo todo = new ToDo("", "", LocalDate.now(), false);
+		model.put("todo", todo);
+		return "addToDo";
+	}
+  ```
+*----------------------------*----------------------------*----------------------------
+
+- Also, 
+  [ add
+    ```
+	@RequestMapping(value="add-todo", method=RequestMethod.POST)
+	public String addToDo(@Valid @ModelAttribute("todo") ToDo todo, BindingResult result, ModelMap model) {
+		if (result.hasErrors()) {
+			return "addToDo";
+		}
+		
+		todoservice.addToDo(todo.getTaskName(), todo.getDescription(), todo.getDate(), false);
+		
+		return "redirect:list-todo";
+	}
+    ```
+  ]
+*----------------------------*----------------------------*---------------------------- 
+       
+- Also, 
+   add <form:errors path="description" cssClass="text-warning"/>
+   
+*----------------------------*----------------------------*----------------------------
+
+
+
+Adding Target Date Field to Todo Page
+
+```
+<dependency>
+	<groupId>org.webjars</groupId>
+	<artifactId>bootstrap-datepicker</artifactId>
+	<version>1.9.0</version>
+</dependency>
+
+<link href="webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet">
+
+<script src="webjars/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+		<script type="text/javascript">
+			$('#date').datepicker({
+				format:'yyyy-mm-dd',
+				startDate:'0d',
+				autoClose:true,
+				todayHighlight:true
+			});
+		</script>
+
+
+- Inside application.properties:
+  - spring.mvc.format.date=yyyy-MM-dd
+  
+  
+  
+<div class="d-flex flex-column align-items-center m-3 form-group">
+	<label for="date" class="m-2" style="width:90px">Date &#x2B07 </label>
+	<form:input type="text" id="date" path="date" style="width:250px" cssClass="form-control" name="date" required="required"/>
+	<div>
+		<form:errors path="date" cssClass="text-warning"/>
+	</div>
+</div>
+  
+```
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+Adding "JSP-FRAGMENTS"
+
+- /WEB-INF/jsp/common/footer.jspf, header.jspf, navigation.jspf
+- use <%@ include file="common/header.jspf"%>
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+- Adding PUT / POST / PUT / DELETE API Endpoints.
+
+	- GetMapping() / PostMapping() / DeleteMapping() / PutMapping()
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+
+Preparing for Spring Security
+
+- pom.xml Modified
+```
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
+
+```
+package .security;
+
+@Configuration
+public class SpringSecurityConfiguration {
+	//LDAP or Database
+	//In Memory 
+	
+	//InMemoryUserDetailsManager
+	//InMemoryUserDetailsManager(UserDetails... users)
+	
+	
+    /**
+     * Creates an in-memory user details manager with predefined user credentials.
+     *
+     * @return InMemoryUserDetailsManager with a single user.
+     */
+	@Bean
+	public InMemoryUserDetailsManager createUserDetailsManager() {
+		
+		// Lambda function to encode passwords using BCrypt
+		Function<String, String> passwordEncoder
+				= input -> passwordEncoder().encode(input);
+		
+		// Creating a user with a username, encoded password, and assigned roles
+		UserDetails userDetails = User.builder()
+									.passwordEncoder(passwordEncoder)
+									.username("in28minutes")
+									.password("dummy")
+									.roles("USER","ADMIN")
+									.build();
+		
+		// Returning an in-memory user details manager with the created user
+		return new InMemoryUserDetailsManager(userDetails);
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+	
+}
+
+
+# Inside Controller:
+	private String getLoggedInUsername(ModelMap model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return authentication.getName();
+	}
+
+```
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+// What is session-attributes?
+
+- Details stored across multiple requests, Unlike normal-requests.
+- Details are stored on server.
+- Use it in all of the controllers, Where you want to use "name".
+- But you just need to capture it inside modal, In only one controller.
+
+```
+@Controller
+//@SessionAttributes("name")
+public class ToDoController {...
+```
+
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+Adding Spring Boot Starter Data JPA and Getting H2 database ready
+
+```
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<dependency>
+	<groupId>com.h2database</groupId>
+	<artifactId>h2</artifactId>
+	<scope>runtime</scope>
+</dependency>
+```
+
+*----------------------------*----------------------------*---------------------------- 
+
+```
+spring.datasource.url=jdbc:h2:mem:testdb
+```
+
+*----------------------------*----------------------------*---------------------------- 
+
+```
+import static org.springframework.security.config.Customizer.withDefaults;
+@Configuration
+public class SpringSecurityConfiguration {
+	
+	//All URLs are protected
+	//A login form is shown for unauthorized requests
+	//CSRF disable
+	//Frames
+	
+	//If you don't configure SecurityFilterChain, Spring Security will apply its default security, which protects everything by default.
+	
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // Require authentication for all HTTP requests
+		http.authorizeHttpRequests(auth->auth.anyRequest().authenticated());
+		
+        // Enable form-based login with default settings
+		http.formLogin(withDefaults());
+		
+        // Disable CSRF protection (not recommended for production use)
+		http.csrf(csrf -> csrf.disable());
+		
+        // Disable X-Frame-Options to allow embedding in iframes (use cautiously)
+		http.headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()));
+		
+		return http.build();
+	}
+}
+```
+
+*----------------------------*----------------------------*----------------------------
+
+### /src/main/resources/data.sql
+```
+insert into todo (ID, USERNAME, DESCRIPTION, TARGET_DATE, DONE)
+values(10001,'in28minutes', 'Get AWS Certified', CURRENT_DATE(), false);
+```
+
+*----------------------------*----------------------------*---------------------------- 
+### Without 
+```
+spring.jpa.defer-datasource-initialization=true:
+``` Spring Boot runs schema.sql and data.sql before Hibernate initializes the database schema.
+
+
+*----------------------------*----------------------------*---------------------------- 
+###Create JPA Repository
+```
+public interface TodoRepository extends JpaRepository<ToDo, Integer> {
+	public List<ToDo> findByUsername(String username);
+}
+```
+*----------------------------*----------------------------*---------------------------- 
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
