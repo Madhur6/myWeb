@@ -1,6 +1,9 @@
 <html>
+	<style>
+	
+	</style>
 	<head>
-		<title> WELCOME </title>
+		<title class=""> WELCOME </title>
 	</head>
 	<body>
 		<h1> Welcome </h1>
