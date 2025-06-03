@@ -18,7 +18,6 @@ public class LoginController {
 	@Autowired
 	AuthenticationService authenticationService;
 	
-
 	
 	@RequestMapping("/hello")
 	@ResponseBody // Allow us to return JSON/XML, OTHERWISE IT LOOKS FOR .jsp FILE IN RESOURCES...💡

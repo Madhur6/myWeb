@@ -63,6 +63,8 @@ public class ToDo {
 	public void setTaskName(String taskName) {
 		this.taskName = taskName;
 	}
+	
+	@Size(min=10, message="Atleast 10 characters are required!")
 	public String getDescription() {
 		return description;
 	}

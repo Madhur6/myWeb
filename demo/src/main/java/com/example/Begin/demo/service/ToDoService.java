@@ -3,6 +3,7 @@ package com.example.Begin.demo.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.springframework.stereotype.Service;
 
@@ -27,5 +28,28 @@ public class ToDoService {
 		todoList.add(new ToDo(++counter, username, taskname, description, date, done));
 	}
 	
+	public void deleteToDo(int id) {
+//		Predicate<? super ToDo> predicate = todo -> todo.getId() == id;
+//		todoList.removeIf(predicate);
+		
+//		todoList.removeIf(todo -> todo.getId() == id);
+		
+		for(int i = 0; i < todoList.size(); i++) {
+			if (todoList.get(i).getId() == id) {
+				todoList.remove(i);
+				break;
+			}
+		}
+	}
+	
+	public ToDo getById(int id) {
+		Predicate<? super ToDo> predicate = todo -> todo.getId() == id;
+		ToDo todo = todoList.stream().filter(predicate).findFirst().get();
+		return todo;
+	}
+	
+	public void updateToDo(ToDo todo) {
+		// Delete it & then add it
+	}
 	
 }

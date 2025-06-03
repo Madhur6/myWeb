@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.example.Begin.demo.model.ToDo;
 import com.example.Begin.demo.service.ToDoService;
@@ -18,6 +19,7 @@ import com.example.Begin.demo.service.ToDoService;
 import jakarta.validation.Valid;
 
 @Controller
+@SessionAttributes("name")
 public class ToDoController {
 	
 	@Autowired
@@ -37,19 +39,40 @@ public class ToDoController {
 		return "AddToDo";
 	}
 	
+	// @Valid: Validates our POST requests for us...
+	// 
+	
 	@RequestMapping(value="/add-todo", method=RequestMethod.POST)
-	public String addToDo(@ModelAttribute("todo") ToDo todo, BindingResult result, ModelMap model) {
+	public String addToDo(@Valid @ModelAttribute("todo") ToDo todo, BindingResult result, ModelMap model) {
 		if (result.hasErrors()) {
 			return "AddToDo"; // Just stay on the same page / url
 		}
 		
-		todoService.addToDo(todo.getUserName(), todo.getTaskName(), todo.getDescription(), todo.getDate(), todo.isDone());
+		String name = (String) model.get("name");
+		todoService.addToDo(name, todo.getTaskName(), todo.getDescription(), todo.getDate(), todo.isDone());
 		return "redirect:todo-list";
 	}
 	
 	// /add-todo ---------GET-----------> AddToDo.jsp ----------500 😮 -----------> Binding failed
 
 	
+	@RequestMapping("delete-todo")
+	public String deleteToDo(@RequestParam int id) {
+		todoService.deleteToDo(id);
+		return "redirect:todo-list";
+	}
+	
+	
+	@RequestMapping(value="/update-todo", method=RequestMethod.GET)
+	public String getUpdateToDoPage(@RequestParam int id, ModelMap model) {
+		ToDo todo = todoService.getById(id);
+		model.put("todo", todo);
+		return "AddToDo";
+	}
+	
+	@RequestMapping(value="/update-todo", method=RequestMethod.POST)
+	public String UpdateToDoPage(@RequestParam int id, ModelMap model) {
+	}
 }
 
 
