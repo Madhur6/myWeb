@@ -11,3 +11,12 @@ public class RestControllerEx {
 		return "login"; // DO CHECK OUT THE `VIEW-SOURCE` FOR THIS END-POINT ON THE BROWSER😉
 	}
 }
+
+// ACTUATOR: monitor and manage our app. in production
+
+// provides by-default end-points: health / metrics / beans / mapping / 
+// spring-boot-starter-actuator
+
+
+
+

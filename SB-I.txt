@@ -16,9 +16,15 @@
 
 💡 CHAPTER VII : LET'S LOGIN
 
-💡 CHAPTER VIII: JS-TAG-LIBRARIES
+💡 CHAPTER VIII: JS-TAG-LIBRARIES & BootStrap
 
+💡 CHAPTER IX  : Validation & 2-WAY BINDING 😮
 
+💡 CHAPTER X   : LET'S BUILD TO-DO  
+
+💡 CHAPTER XI  : LET'S CONNECT & MORE
+
+💡 CHAPTER XII : LET'S AUTHENTICATE💻
 
 - ----------------------------------------------✨ INDEX ✨---------------------------------------------------
 					<< LET'S START LEARNING 😊 >>
@@ -325,7 +331,8 @@ Introduced in Spring 2.5.                                           Introduced i
 - Modify your application.properties:
   - spring.mvc.view.prefix=/WEB-INF/jsp/
     spring.mvc.view.suffix=.jsp
-	logging.level.org.springframework=debug
+    
+  - logging.level.org.springframework=debug
 
 
 [[
@@ -358,7 +365,10 @@ Introduced in Spring 2.5.                                           Introduced i
 *-------------------------------*-------------------------------*
 // ModelMap
 
-- Pass query-params to our .jsp file, Use ModelMap
+- (There is a Model / ModelMap / ModelAndView)
+
+- The advantage of ModelMap is it gives us the ability to pass a collection of values and treat these values as if they were within a Map.
+- To Pass query-params to our .jsp file, Use ModelMap
   - @RequestMapping(value="login", method=RequestMethod.GET, ModelMap model)
   - model.put("name", name) 
 	
@@ -524,7 +534,7 @@ Monitor Applications using Spring Boot Actuator
 
 
 
-- ------------------------------------------< JS TAG LIBRARIES >---------------------------------------------
+- ------------------------------------------< JS TAG LIBRARIES & BootStrap >---------------------------------------------
 
 - --------------------------------------------✨CHAPTER-VIII✨-----------------------------------------------
 
@@ -591,8 +601,734 @@ Monitor Applications using Spring Boot Actuator
 
 
 
+*----------------------------*----------------------------*
+// Adding Bootstrap CSS framework to Spring Boot Project using webjars
+
+```
+<dependency>
+	<groupId>org.webjars</groupId>
+	<artifactId>bootstrap</artifactId>
+	<version>5.1.3</version>
+</dependency>
+ 
+<dependency>
+	<groupId>org.webjars</groupId>
+	<artifactId>jquery</artifactId>
+	<version>3.6.0</version>
+</dependency>
+
+<link href="webjars/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" >
+<script src="webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+<script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+
+```
 
 
 
 
-- --------------------------------------------⭐CHAPTER-VIII ENDS⭐---------------------------------------------
+
+- --------------------------------------------⭐CHAPTER-VIII ENDS⭐--------------------------------------------
+
+
+
+
+
+
+
+- ------------------------------------< Validation & 2-WAY BINDING 😮 >--------------------------------------
+
+- ---------------------------------------------✨CHAPTER-IX✨------------------------------------------------
+
+
+
+*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------*----------------------------
+
+#✨ Adding Validation in 2-way binding (.jsp & _controller.java)
+
+
+#1.
+```
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+
+
+#2. Adding validations, To bean:
+  - @Size(min=10, message="Enter atleast 10 characters")
+    private String description;
+
+
+#3. Adding form:
+  - <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+  
+  - Also, Add spring form tag library...
+    [ <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %> ]
+
+
+#4. Also, 
+    - [ <form method="post" modelAttribute="todo"> ] 
+    -> This modelAttribute binds the form with this "todo" object in controller...	[ public String addNewToDo(ToDo todo, ModelMap model) ]
+
+```
+<form:form method="post" modelAttribute="todo">
+	<fieldset class="mb-3">
+		<form:label path="description"> description </form:label>
+		<form:input type="text" path="description" required="required"/>
+		<form:errors path="description" cssClass="text-warning"/>
+	</fieldset>
+</form:form>
+```
+
+
+#5. Instead of @RequestParams, Bind it to directly to "bean" itself...
+  [ add
+    ```
+	@RequestMapping(value="add-todo", method=RequestMethod.POST)
+	public String addToDo(@Valid @ModelAttribute("todo") ToDo todo, BindingResult result, ModelMap model) {
+		if (result.hasErrors()) {
+			return "addToDo";
+		}
+		
+		todoservice.addToDo(todo.getTaskName(), todo.getDescription(), todo.getDate(), false);
+		
+		return "redirect:list-todo";
+	}
+    ```
+  ]
+
+
+#6. Also,
+  [ Description: <form:input type="text" path="description" ... ] 
+  
+  -> binds the input form to "description" variable of "todo" bean...
+
+
+#7. Also, 
+  create form:input for everything, So that nothing is null...
+  & add empty todo object inside your get method of "getToDo"
+  
+  ```
+	@RequestMapping(value="add-todo", method=RequestMethod.GET)
+	public String getAddToDo(ModelMap model) {
+		ToDo todo = new ToDo("", "", LocalDate.now(), false);
+		model.put("todo", todo);
+		return "addToDo";
+	}
+  ```
+
+
+#8. Also, 
+   add <form:errors path="description" cssClass="text-warning"/>
+   
+
+
+
+
+
+
+- --------------------------------------------⭐CHAPTER-IX ENDS⭐----------------------------------------------
+
+
+
+
+
+
+
+
+- ------------------------------------------< LET'S BUILD TO-DO >---------------------------------------------
+
+- ---------------------------------------------✨CHAPTER-X✨-------------------------------------------------
+
+
+# 1. Create a model ToDO
+	Add @Entity / @Id / @GeneratedValue(strategy=GenerationType.AUTO) ...
+
+```
+@Entity
+public class ToDo {
+	@Id
+	@GeneratedValue()
+	private int id;
+	private String username;
+	private String taskName;
+	
+	@Size(min=10, message="Enter atleast 10 characters!")
+	private String description;
+	private LocalDate date;
+	private boolean done;
+	...
+```
+
+
+	
+
+# 2. Create a Service ToDo:
+	Add @Service annotation...
+
+```
+@Service
+public class todoService {
+	private static List<ToDo> todoList = new ArrayList<>();
+	
+	private static int counter = 3;
+	
+	
+	static {
+		todoList.add(new ToDo(1, "myPrac", "learning sb", LocalDate.now().plusYears(1), false));
+		todoList.add(new ToDo(2, "myPrac", "learning angular", LocalDate.now().plusYears(2), false));
+		todoList.add(new ToDo(3, "myPrac", "learning git", LocalDate.now().plusYears(3), false));
+	}
+
+	
+	public List<ToDo> getToDo() {
+		System.out.println(todoList);
+		return todoList;
+	}
+	
+	public List<ToDo> getToDoByUsername(String username){
+		Predicate<? super ToDo> predicate = todo -> todo.getUsername() != null && todo.getUsername().equalsIgnoreCase(username);
+		return todoList.stream().filter(predicate).toList();
+	}
+```
+
+
+
+	
+# 3. Create a controller ToDo:
+	Add @Controller annotation...
+
+```
+@Controller
+@SessionAttributes("name")
+public class todoController {
+	
+	@Autowired
+	private todoService todoservice;
+	
+	@RequestMapping("list-todo")
+	public String getToDo(ModelMap model) {
+		List<ToDo> todos = todoservice.getToDo();
+		System.out.println(todos);
+		model.addAttribute("todos", todos);
+		return "ToDoList";
+	}	
+```
+
+
+
+
+# 4. Create ToDo.jsp:
+
+```
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<html>
+	<head>
+		<title>To Do List</title>
+		<link href="webjars/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+	</head>
+	<body>
+		<div class="container m-3 p-3">
+			<table class="table">		
+				<thead>
+					<th>UserName</th>
+					<th>TaskName</th>
+					<th>Description</th>
+					<th>Date</th>
+					<th>Done</th>
+				</thead>
+				<tbody>
+					<c:forEach items="${todos}" var="todo">
+						<tr>
+							<td>${todo.userName}</td>
+							<td>${todo.taskName}</td>
+							<td>${todo.description}</td>
+							<td>${todo.date}</td>
+							<td>${todo.done}</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+			<a href="add-todo" class="btn">add</a>
+		</div>
+		<script src="webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+		<script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+	</body>
+</html>
+```
+
+
+# 5. Add addToDo.jsp:
+
+//💡 ModelAttribute: In the "addToDo" method, We have an "ToDo" object bound to our View. 
+		     We can map our form fields to an object model as simply as that. 
+		    In the method, we’re fetching values from the form and setting them to ModelMap.
+		    In the end, we return "ToDoList" View, which means that we call the respective JSP file as a View representative.//
+
+[[ //💡 Valid: Refer to Chapter IX for more detailed explaination.💫 ]]
+
+```
+	@RequestMapping(value="add-todo", method=RequestMethod.GET)
+	public String getAddToDo(ModelMap model) {
+		ToDo todo = new ToDo("", "", "", LocalDate.now(), false);
+		model.put("todo", todo);
+		return "addToDo";
+	}
+	@RequestMapping(value="add-todo", method=RequestMethod.POST)
+	public String addToDo(@Valid @ModelAttribute("todo") ToDo todo, BindingResult result, ModelMap model) {
+		if (result.hasErrors()) {
+			return "addToDo";
+		}
+		todoservice.addToDo(todo.getUsername(), todo.getTaskName(), todo.getDescription(), todo.getDate(), false);
+		return "redirect:list-todo";
+	}	
+```
+```
+	public void addToDo(String username, String taskname, String description, LocalDate date, boolean done) {
+		todoList.add(new ToDo(++counter, username, taskname, description, date, done));
+	}
+	
+```
+```
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<html>
+	<head>
+		<link href="webjars/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" >
+		<link href="webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet">
+		<title>Add To Do </title>
+		<style>
+		</style>
+	</head>
+	<body>
+		<%@ include file="common/header.jspf" %>
+		<%@ include file="common/navigation.jspf" %>
+		<div class="p-3">	
+			<h4 class="text-center m-3"> Add Your To-Dos ${name} </h4>
+			<hr>
+			<div class="container m-3 p-3">
+				<form:form method="post" modelAttribute="todo">
+					
+					<fieldset class="mb-3">
+						<form:label path="taskName"> Task Name </form:label>
+						<form:input type="text" path="taskName" required="required"/>
+						<form:errors path="taskName" cssClass="text-warning"/>
+					</fieldset>
+					
+					<fieldset class="mb-3">
+						<form:label path="description"> description </form:label>
+						<form:input type="text" path="description" required="required"/>
+						<form:errors path="description" cssClass="text-warning"/>
+					</fieldset>
+					
+					<fieldset class="mb-3">
+						<form:label path="date"> Completion Date </form:label>
+						<form:input type="text" path="date" required="required"/>
+						<form:errors path="date" cssClass="text-warning"/>
+					</fieldset>
+					<input type="submit" class="btn btn-success"/>
+				</form:form>
+			</div>
+		</div>
+		<script src="webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+		<script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+		<script src="webjars/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+		<script type="text/javascript">
+			$('#date').datepicker({
+			    format: 'yyyy-mm-dd'
+			});
+		</script>
+		<%@ include file="common/footer.jspf" %>	
+	</body>
+</html>
+```
+
+
+
+# 6. Adding Target Date Field to Todo Page
+
+```
+<dependency>
+	<groupId>org.webjars</groupId>
+	<artifactId>bootstrap-datepicker</artifactId>
+	<version>1.9.0</version>
+</dependency>
+```
+```
+<link href="webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet">
+
+<script src="webjars/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+		<script type="text/javascript">
+			$('#date').datepicker({
+				format:'yyyy-mm-dd',
+				startDate:'0d',
+				autoClose:true,
+				todayHighlight:true
+			});
+</script>
+```
+
+✨ - Inside application.properties:
+        spring.mvc.format.date=yyyy-MM-dd
+
+```
+<div class="d-flex flex-column align-items-center m-3 form-group">
+	<label for="date" class="m-2" style="width:90px">Date &#x2B07 </label>
+	<form:input type="text" id="date" path="date" style="width:250px" cssClass="form-control" name="date" required="required"/>
+	<div>
+		<form:errors path="date" cssClass="text-warning"/>
+	</div>
+</div>
+  
+```
+
+
+
+
+
+
+
+- --------------------------------------------⭐CHAPTER-X ENDS⭐-----------------------------------------------
+
+
+
+
+
+
+
+
+- ------------------------------------------< LET'S CONNECT & MORE >-------------------------------------------------
+
+- ---------------------------------------------✨CHAPTER-XI ✨-------------------------------------------------
+
+# 1. 
+# 💡 What is session-attributes?
+
+- Details stored across multiple requests, Unlike normal-requests.
+- Details are stored on server.
+
+
+```LoginController
+@Controller
+@SessionAttributes("name")
+public class LoginController {...
+
+public String tryLogin(@RequestParam String name, @RequestParam String password, ModelMap model) {
+	if (authenticationService.authService(name, password)) {
+		model.put("name", name);...
+```
+```ToDoController
+@Controller
+@SessionAttributes("name")
+public class ToDoController {...
+
+public String addToDo(@Valid @ModelAttribute("todo") ToDo todo,..){
+	String username = (String)model.get("name");
+	todoService.addToDo(username,..)
+} 😊
+```
+
+
+# 2.
+# 💡 Add the "JSPF" 
+
+```
+- /WEB-INF/jsp/common/footer.jspf, header.jspf, navigation.jspf
+- use <%@ include file="common/header.jspf"%>
+```
+
+
+```footer.jspf
+<html>
+	<head>
+		<title> footer </title>
+	</head>
+	<body>
+	
+		<script src="webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+		<script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+		<script src="webjars/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>				
+	</body>
+</html>
+```
+```header.jspf
+<html>
+	<head>
+		<link href="webjars/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" >
+		<link href="webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" >
+		
+		<title>Manage Your Todos</title>		
+	</head>
+	<body>
+	</body>
+</html>
+```
+
+```navigation.jsp
+<nav class="navbar navbar-expand-md navbar-light bg-light mb-3 p-3">
+
+	<a class="navbar-brand m-1" href="">My-Practice</a>
+	
+	<div class="collapse navbar-collapse">
+		<ul class="navbar-nav">
+			<li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+			<li class="nav-item"><a class="nav-link" href="/list-todo">To-Do</a></li>
+		</ul>
+	</div>
+	
+	<ul class="navbar-nav">
+		<li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+	</ul>
+	
+</nav>
+```
+
+
+
+
+
+
+# 3. 
+# 💡 Delete The Entry ❌❌❌
+
+```ToDoController
+	@RequestMapping("delete-todo")
+	public String deleteToDo(@RequestParam int id) {
+		todoService.deleteToDo(id);
+		return "redirect:list-todo";
+	}
+```
+
+```ToDoService
+	public void deleteToDo(int id) {
+		Predicate<? super ToDo> predicate = todo -> todo.getId() == id;
+		todoList.removeIf(predicate);
+	}
+```
+
+```ToDoList.jsp
+<td><a href="/delete-todo?id=${todo.id}" class="btn btn-sm btn-danger">Delete</a></td>
+```
+
+
+# 4. Update the Entry 🐒 --> 👪
+
+```ToDoController
+	@RequestMapping(value="/update-todo", method=RequestMethod.GET)
+	public String getUpdateToDo(@RequestParam int id, ModelMap model) {
+		ToDo todo = todoService.getById(id);
+		model.put("todo", todo);
+		return "AddToDo";
+	}
+	@RequestMapping(value="/update-todo", method=RequestMethod.POST)
+	public String updateToDo(@Valid @ModelAttribute("todo") ToDo todo, BindingResult result, ModelMap model) {
+		if (result.hasErrors()) {
+			return "AddToDo";
+		}	
+
+		String name = (String) model.get("name");
+		todo.setUserName(name);
+
+		todoService.updateToDo(todo);
+		return "redirect:todo-list";
+	}
+```
+```ToDoService
+	public void updateToDo(ToDo todo) {
+		deleteToDo(todo.getId());
+		todoList.add(todo);
+	}
+```
+```ToDoList.jsp
+<td><a href="/update-todo?id=${todo.id}" class="btn btn-sm btn-info">Update</a></td>
+```
+
+
+# 5. Single EndPoint 😮:
+
+```ToDoController
+@RequestMapping(value = "add-todo", method = {RequestMethod.GET, RequestMethod.POST})
+public String handleAddToDo(@Valid @ModelAttribute("todo") ToDo todo,
+                            BindingResult result,
+                            ModelMap model) {
+    // If GET: create a blank ToDo object
+    if (!result.isBindingFailure() && !result.hasErrors() && todo.getTaskName() == null) {
+        // Likely a GET request
+        todo = new ToDo("", "", "", LocalDate.now(), false);
+        model.put("todo", todo);
+        return "addToDo";
+    }
+
+    // If POST: check validation
+    if (result.hasErrors()) {
+        return "addToDo";
+    }
+
+    todoservice.addToDo(todo.getUsername(), todo.getTaskName(), todo.getDescription(), todo.getDate(), false);
+    return "redirect:list-todo";
+}
+
+```
+
+
+
+
+
+
+
+
+- --------------------------------------------⭐CHAPTER-XI ENDS⭐-----------------------------------------------
+
+
+
+
+- -----------------------------------------< LET'S AUTHENTICATE💻 >--------------------------------------------
+
+- ---------------------------------------------✨CHAPTER-XII ✨------------------------------------------------
+
+
+<<<<<<<<<<<<<<<<<<
+-----------------------*-----------------------*-----------------------*-----------------------*-----------------------*-----------------------*
+
+- @SpringBootApplication annotation is _convenience annotation_ that combines:
+	- 1). @Configuration		: Class can be used by "Spring IoC {Inversion of Control}_container_" as a source of "@Bean Bean" definitions.
+	- 2). @EnableAutoConfiguration	: Automatically configure application based on the "dependencies" present on the _classpath_.
+	- 3). @ComponentScan		: Allow Spring to discover & register "Beans" in the specified "PKG" & it's "Sub-PKG".
+
+-----------------------*-----------------------*-----------------------*-----------------------*-----------------------*-----------------------*
+
+- @Configuration:
+	- Classes annotated with @Configuration can define one or more @Bean methods. Each method annotated with @Bean returns an "Object" that
+		should be registered as bean in spring application context.
+	- Custom configuration
+	- Spring treats `@Configuration classes` as "singletons", Meaning that the beans defined within them are created only once & shared across	
+		the application. [ or The same instance will be returned each time the bean is requested]
+
+- @Bean: Are central to IoC principal, Which allows spring to manage the lifecycle & dependencies of objects.
+       Dependency Injection / Configuration flexibility [xml/java annotations/java configuration]
+       Scope management:[allows you to define the scope of beans (singletons / prototype / request / session)]
+       Aspect-Oriented Programming (AOP): Easily integrate with AOP features (logging / security / transactions)
+       By-default all spring-beans are "singleton-beans" unless configured otherwise.
+       By-default all "singleton-beans" are initialized "eagerly" at application-startup.
+       Lazy-Initialization, Postpones the "creation-of-object" until it is first requested.
+
+- @Scope("prototype") / "singleton" / "request" / "session" : To define a custom-scope for a Spring-Bean
+
+-----------------------*-----------------------*-----------------------*-----------------------*-----------------------*-----------------------*
+
+- DISPATCHER-SERVLET:
+	- Acts as the "Front-Controller" for Spring-Based Web Applications.
+	- "Front-Controller": Any request is going to come into our website, The FC is going to stand in front and is going to accept all the requests
+	   & makes a decision that who is the right controller to handle that request.
+
+
+
+					     HttpSecurity[FilterChain --> HttpSecurity.build()]
+	    					^
+						|
+						|
+ [Header->JWT]					|
+-Request---> [DispatcherServlet] -------> [SpringSecurity/SecurityFilterChain] --------> [Controller]
+
+		          | [UsernamePassword|	             |[CSRFFilter]|
+			  | Authentication   |	   	     |		  |
+			  | Filter]          |   [JwtFilter] |		  |
+				        (Chain of Responsibility)
+						     |
+						     |
+						     v
+				 JwtUtil / JwtHelper / JwtAuthentication ()
+
+-----------------------*-----------------------*-----------------------*-----------------------*-----------------------*-----------------------*
+
+My JwtFilterChain will only process request with a header that has "Bearer token_value"
+
+-> Each "_secured_spring_application_" maintains a Data-Structure [A HashMap<>()]
+
+-> HashMap<>{	______________________
+		| "userI" | "userII" |
+	}	----------------------
+
+-> Class that handles all these above things is called: 
+	`SecurityContextHolder` ---------------> UsernamePasswordAuthenticationToken
+
+-> trying to login ---creates `UsernamePasswordAuthenticationToken`---> update the HashMap 
+				by calling `SecurityContextHolder.setAuthentication(Token)` 
+*-----------------*-----------------*-----------------*-----------------*-----------------*-----------------
+
+>>>>>>>>>>>>>>>>>
+
+
+# 1. POM 🎉🎉:
+
+```
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+```
+
+# 2. Security ➕:
+```security
+@Configuration
+public class SpringSecurityConfiguration {
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+//		http.formLogin(withDefaults());
+	    http.formLogin(form -> form
+	            .defaultSuccessUrl("/todo-list", true)
+	    );
+		http.csrf(csrf -> csrf.disable());
+		http.headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()));	
+		return http.build();
+	}
+	@Bean
+	public InMemoryUserDetailsManager createUserDetailsManager() {
+		Function<String, String> passwordEncoder = input -> passwordEncoder().encode(input);
+		UserDetails userDetails = User.builder().passwordEncoder(passwordEncoder).username("harry").password("123").roles("USER","ADMIN")
+			    .build();	
+		return new InMemoryUserDetailsManager(userDetails);
+	}	
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();}}
+```
+
+```ToDoController
+	private String getLoggedInUsername(ModelMap model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return authentication.getName();}
+```
+*---------------------------------*---------------------------------*
+```ToDoController
+	@RequestMapping("/todo-list")
+	public String getToDo(ModelMap model) {
+		String username = getLoggedInUsername(model);
+		List<ToDo> todos = todoService.getToDoByUsername(username);
+		model.addAttribute("todos", todos);
+		return "ToDoList";
+	}
+	@RequestMapping(value="/add-todo", method=RequestMethod.POST)
+	public String addToDo(@Valid @ModelAttribute("todo") ToDo todo, BindingResult result, ModelMap model) {
+		if (result.hasErrors()) {
+			return "AddToDo"; // Just stay on the same page / url
+		}
+		String name = getLoggedInUsername(model);	
+		todoService.addToDo(name, todo.getTaskName(), todo.getDescription(), todo.getDate(), todo.isDone());
+		return "redirect:todo-list";}
+```
+*---------------------------------*---------------------------------*
+```ToDoService
+	public List<ToDo> getToDoByUsername(String username){
+		Predicate<? super ToDo> predicate = todo -> todo.getUserName() != null && todo.getUserName().equalsIgnoreCase(username);
+		return todoList.stream().filter(predicate).toList();
+	}
+```
+
+
+- ---------------------------------------------⭐CHAPTER-XII ENDS⭐----------------------------------------------
+
+
