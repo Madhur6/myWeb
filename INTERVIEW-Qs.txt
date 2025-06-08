@@ -1,6 +1,15 @@
 # Madhur's Cheat Sheet for Spring-Boot interview preparation 😉💡
 
-- --------------------------------------------✨ INTERVIEW Qs ✨---------------------------------------------------
+
+
+- ----------------------------------------------✨ INDEX ✨---------------------------------------------------
+
+💡 CHAPTER I   : BASIC SPRING-BOOT
+
+💡 CHAPTER II  : MORE SPRING-BOOT
+
+
+- ----------------------------------------------✨ INDEX ✨---------------------------------------------------
 					<< LET'S START LEARNING 😊 >>
 
 
@@ -219,3 +228,174 @@ Q. What does @GeneratedValue do in JPA?
 
 
 - --------------------------------------------⭐SET-I ENDS⭐--------------------------------------------
+
+
+
+
+
+
+- ------------------------------------------< MORE SPRING-BOOT > ------------------------------------
+
+- ----------------------------------------------✨ SET-II ✨-------------------------------------------
+
+
+Q.  harry wants to test whether his Spring Boot microservices are healthy and 
+    running. What should he configure?
+ A) Spring Boot Actuator health endpoint
+ B) A manual ping test every few minutes
+ C) Check logs manually
+ D) Use an external script to restart services periodically
+
+
+
+Q. Snape is debugging a Spring Boot application and needs to check the active 
+   beans. What command can he use in the Spring Boot Actuator?
+ A) /actuator/beans
+ B) /actuator/health
+ C) /actuator/logs
+ D) /actuator/info
+
+
+
+Q. Raja needs to ensure that a specific method runs automatically when a 
+Spring Boot application starts. What annotation should he use?
+ A) @PostConstruct
+ B) @PreDestroy
+ C) @InitMethod
+ D) @AutoRun
+
+
+
+Q. Hermionne wants to expose a REST endpoint that only accepts JSON input. What 
+should she specify in the controller?
+ A) @PostMapping(value = "/api", consumes = "application/json")
+ B) @PostMapping(value = "/api") without any extra configuration
+ C) Check the request type manually inside the controller method
+ D) Use @Consumes("application/json")
+
+
+
+Q. Ron wants to define a custom scope for a Spring bean. Which annotation 
+should he use?
+ A) @Scope("prototype")
+ B) @Singleton
+ C) @Service
+ D) @Component
+
+
+
+Q. Padma needs to implement a custom authentication mechanism in her Spring 
+Boot application. Which interface should she implement?
+ A) UserDetailsService
+ B) AuthenticationManager
+ C) SecurityFilterChain
+ D) AuthProvider
+
+
+
+Q. Fred is working on a Spring Boot application where he needs to ensure that 
+a newly created entity is assigned a unique ID automatically. What should he 
+do?
+ A) Use @GeneratedValue(strategy = GenerationType.IDENTITY) on the ID field
+ B) Manually assign a UUID before saving the entity
+ C) Use @Column(unique = true) and check for duplicates
+ D) Generate a random number and assign it to the ID
+
+
+
+Q. Ron wants to handle exceptions globally in his Spring Boot REST API. 
+What should he use?
+ A) @ControllerAdvice with @ExceptionHandler
+ B) Manually catch exceptions in every controller method
+ C) Use try-catch inside the repository layer
+ D) Disable exception handling to allow default error messages
+
+
+
+Q. Harry wants to ensure that the same API request is not processed multiple 
+times if the client sends it repeatedly. What can he implement?
+ A) Idempotency using unique request identifiers
+ B) Use @Transactional to prevent duplicates
+C) Increase API timeout to avoid duplicate requests
+ D) Manually check each request's payload in the controller
+
+
+
+Q. George is using Spring Security and wants to restrict access to a particular API 
+endpoint to only users with the "ADMIN" role. What should he do?
+ A) Use @PreAuthorize("hasRole('ADMIN')")
+ B) Manually check the user’s role in the controller
+ C) Store user roles in session attributes
+ D) Disable security and validate requests manually
+
+
+
+Q. Pansy is developing a REST API where she wants to support both XML and 
+JSON responses based on client requests. What should she do?
+A) Use @RestController with produces={"application/json", "application/xml"}
+ B) Only return JSON as XML is outdated
+ C) Manually parse the response format in the controller
+ D) Use @ResponseBody without any content type specification
+
+
+
+Q. Padma is deploying a Spring Boot microservice and wants to externalize its 
+configuration for di erent environments (dev, test, prod). What should she use?
+ A) Spring Profiles (application-{profile}.properties)
+ B) Hardcode configuration inside the main application class
+ C) Use System.getenv() for all configurations
+ D) Manually change configurations before every deployment
+
+
+
+Q. Ron is building a REST API that should return HTTP 201 Created after 
+successfully creating a resource. What should he do?
+ A) Return ResponseEntity.created(location).build() in the controller
+ B) Always return HTTP 200 OK for successful requests
+ C) Return ResponseEntity.ok() for all responses
+ D) Use @ResponseStatus(HttpStatus.CREATED) at the class level
+
+
+
+Q. Draco is configuring security in his Spring Boot application and wants to 
+allow unauthenticated users to access the login API. What should he do?
+ A) Use http.authorizeRequests().antMatchers("/login").permitAll()
+ B) Remove Spring Security from the project
+ C) Disable authentication for all API endpoints
+ D) Manually validate user credentials inside the controller
+
+
+
+Q. Simon is using Spring Boot and wants to ensure that a DELETE request only 
+deletes a record if it exists. What should he do?
+ A) Check existence with findById() before calling deleteById()
+ B) Call deleteById() without checking and handle exceptions manually
+ C) Use DELETE FROM table WHERE id = ? in a native query
+ D) Allow the API to return 200 OK even if the record doesn't exist.
+
+
+
+Q. Fred wants to ensure that his Spring Boot REST API properly handles 400 
+Bad Request errors when validation fails. What should he configure?
+ A) Use @Valid annotation in the request body parameter
+ B) Catch Exception in a try-catch block
+ C) Disable validation and allow incorrect data
+ D) Return a generic error message instead of specific validation errors.
+
+
+
+Q. Hagrid wants to ensure that his Spring Boot REST API properly handles 400 
+Bad Request errors when validation fails. What should he configure?
+ A) Use @Valid annotation in the request body parameter
+ B) Catch Exception in a try-catch block
+ C) Disable validation and allow incorrect data
+ D) Return a generic error message instead of specific validation errors.
+
+
+
+Q. 
+
+- --------------------------------------------⭐SET-II ENDS⭐--------------------------------------------
+
+
+
