@@ -1,0 +1,6 @@
+INSERT INTO TO_DO(ID, USER_NAME, TASK_NAME, DESCRIPTION, DATE, DONE)
+VALUES (101, 'HARRY', 'Learning', 'Learning Spring Boot & Hibernate', CURRENT_DATE(), false);
+
+
+INSERT INTO TO_DO(ID, USER_NAME, TASK_NAME, DESCRIPTION, DATE, DONE)
+VALUES (102, 'Ron', 'Learning', 'Learning Spring Boot & JPA', CURRENT_DATE(), false);

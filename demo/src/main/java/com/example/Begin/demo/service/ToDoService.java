@@ -49,6 +49,12 @@ public class ToDoService {
 		return todo;
 	}
 	
+	
+	public List<ToDo> getByUsername(String username) {
+		Predicate<? super ToDo> predicate = todo -> todo.getUserName() != null && todo.getUserName().equals(username);
+		return todoList.stream().filter(predicate).toList();
+	}
+	
 	public void updateToDo(ToDo todo) {
 		// Delete it & then add it
 		int index = IntStream.range(0, todoList.size())
@@ -60,6 +66,5 @@ public class ToDoService {
 	}
 	
     // @Configuration: Classes annotated 
-	
 	
 }

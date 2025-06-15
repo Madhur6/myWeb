@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -18,7 +20,7 @@ import com.example.Begin.demo.service.ToDoService;
 
 import jakarta.validation.Valid;
 
-@Controller
+//@Controller
 @SessionAttributes("name")
 public class ToDoController {
 	
@@ -27,7 +29,9 @@ public class ToDoController {
 
 	@RequestMapping("/todo-list")
 	public String getToDo(ModelMap model) {
-		List<ToDo> todos = todoService.getToDo();
+		String username = getLoggedInUsername(model);
+//		List<ToDo> todos = todoService.getToDo();
+		List<ToDo> todos = todoService.getByUsername(username);
 		model.addAttribute("todos", todos);
 		return "ToDoList";
 	}
@@ -51,7 +55,8 @@ public class ToDoController {
 			return "AddToDo"; // Just stay on the same page / url
 		}
 		
-		String name = (String) model.get("name");
+//		String name = (String) model.get("name");
+		String name = getLoggedInUsername(model);
 		todoService.addToDo(name, todo.getTaskName(), todo.getDescription(), todo.getDate(), todo.isDone());
 		return "redirect:todo-list";
 	}
@@ -81,13 +86,37 @@ public class ToDoController {
 		if (result.hasErrors()) {
 			return "AddToDo";
 		}
-		String name = (String) model.get("name");
+//		String name = (String) model.get("name");
+		String name = getLoggedInUsername(model);
 		todo.setUserName(name);
 		todoService.updateToDo(todo);
 		return "redirect:todo-list";
 	}
 	
+	
+	
+	private String getLoggedInUsername(ModelMap model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication(); // method chain
+		return authentication.getName();
+	}
+	
+	// login request ------------> backend [creates a token & assigns it to this particular user]
+	
+	// login again -------should possess that token with me --->
+	
+	
+	// Each secured spring boot application ----it maintain----> A Structure in memory
+	// HashMap <Key, Value>
+	// {
+		// fruits: ["apple", "mango",]
+	//}
+	
+	// class -----That keep track of this Data Structure----> known as ----> SecurityContextHolder ---> UsernamePasswordAuthenticationToken 
+	// If any user comes and tries to sign up in my application, It crates a UsernamePasswordAuthenticationToken, Updates the HashMap
+	// By using the class called SecurityContextHolder.setAuthentication(Token);
 
+	
+	// SNAPSHOT
 }
 
 

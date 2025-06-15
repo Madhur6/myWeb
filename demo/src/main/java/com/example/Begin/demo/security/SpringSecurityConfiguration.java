@@ -1,6 +1,7 @@
 package com.example.Begin.demo.security;
 
 import java.util.function.Function;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
