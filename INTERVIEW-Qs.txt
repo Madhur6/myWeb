@@ -21,10 +21,10 @@
 
 Q. Hermionne's team is building a REST API that should return JSON responses. 
    What annotation should he use to ensure proper serialization of response data?
- A) @RestController
+ A) @Service
  B) @Controller
  C) @RequestParam
- D) @Service
+ D) @RestController
 
 
 
@@ -39,9 +39,9 @@ Q. Harry wants to create a REST endpoint that accepts JSON input and maps it
 
 Q. padma is debugging a Spring Boot application and wants to enable detailed SQL 
    logs. What should she add to application.properties?
- A) spring.jpa.show-sql=true
+ A) spring.debug.sql=true
  B) spring.logging.level=DEBUG
- C) spring.debug.sql=true
+ C) spring.jpa.show-sql=true
  D) spring.datasource.log-statements=true
 
 
@@ -73,7 +73,7 @@ private Long id;
 private String name;  
 // Getters and setters  
 }  
-A. Missing @Id on the id field
+ A. Missing @Id on the id field
  B. Missing @Column on name
  C. Missing @Entity annotation
  D. No issues
@@ -296,8 +296,8 @@ Boot application. Which interface should she implement?
 Q. Fred is working on a Spring Boot application where he needs to ensure that 
 a newly created entity is assigned a unique ID automatically. What should he 
 do?
- A) Use @GeneratedValue(strategy = GenerationType.IDENTITY) on the ID field
- B) Manually assign a UUID before saving the entity
+ A) Manually assign a UUID before saving the entity
+ B) Use @GeneratedValue(strategy = GenerationType.IDENTITY) on the ID field
  C) Use @Column(unique = true) and check for duplicates
  D) Generate a random number and assign it to the ID
 
@@ -305,8 +305,8 @@ do?
 
 Q. Ron wants to handle exceptions globally in his Spring Boot REST API. 
 What should he use?
- A) @ControllerAdvice with @ExceptionHandler
- B) Manually catch exceptions in every controller method
+ A) Manually catch exceptions in every controller method
+ B) @ControllerAdvice with @ExceptionHandler
  C) Use try-catch inside the repository layer
  D) Disable exception handling to allow default error messages
 
@@ -314,19 +314,19 @@ What should he use?
 
 Q. Harry wants to ensure that the same API request is not processed multiple 
 times if the client sends it repeatedly. What can he implement?
- A) Idempotency using unique request identifiers
+ A) Increase API timeout to avoid duplicate requests
  B) Use @Transactional to prevent duplicates
-C) Increase API timeout to avoid duplicate requests
+ C) Idempotency using unique request identifiers
  D) Manually check each request's payload in the controller
 
 
 
 Q. George is using Spring Security and wants to restrict access to a particular API 
 endpoint to only users with the "ADMIN" role. What should he do?
- A) Use @PreAuthorize("hasRole('ADMIN')")
+ A) Disable security and validate requests manually
  B) Manually check the user’s role in the controller
  C) Store user roles in session attributes
- D) Disable security and validate requests manually
+ D) Use @PreAuthorize("hasRole('ADMIN')")
 
 
 
@@ -340,7 +340,7 @@ A) Use @RestController with produces={"application/json", "application/xml"}
 
 
 Q. Padma is deploying a Spring Boot microservice and wants to externalize its 
-configuration for di erent environments (dev, test, prod). What should she use?
+configuration for different environments (dev, test, prod). What should she use?
  A) Spring Profiles (application-{profile}.properties)
  B) Hardcode configuration inside the main application class
  C) Use System.getenv() for all configurations
@@ -377,10 +377,10 @@ deletes a record if it exists. What should he do?
 
 Q. Fred wants to ensure that his Spring Boot REST API properly handles 400 
 Bad Request errors when validation fails. What should he configure?
- A) Use @Valid annotation in the request body parameter
+ A) Return a generic error message instead of specific validation errors.
  B) Catch Exception in a try-catch block
  C) Disable validation and allow incorrect data
- D) Return a generic error message instead of specific validation errors.
+ D) Use @Valid annotation in the request body parameter
 
 
 
@@ -393,7 +393,149 @@ Bad Request errors when validation fails. What should he configure?
 
 
 
+Q. Severus is working on a Spring Boot application with multiple database 
+connections. He wants to define di erent database configurations based on the 
+active environment. What is the best way to achieve this?
+ A) Create multiple application.properties files and switch using @Profile
+ B) Use @ConfigurationProperties and define all database settings in a single file
+ C) Change database configurations manually in application.properties before running
+ D) Use System.setProperty("spring.profiles.active", "dev") in the main method
+
+
+
+Q. Padma needs to store user passwords securely in her Spring Boot 
+authentication system. What is the recommended approach?
+ A) Store plaintext passwords in the database
+ B) Use BCryptPasswordEncoder to hash passwords before storing
+ C) Encrypt passwords using AES and store the key in the application code
+ D) Use MD5 hashing since it is fast and secure
+
+
+
+Q. Draco wants to create a REST endpoint that accepts JSON input and maps it 
+to a Java object automatically. Which annotation should he use?
+ A) @RequestBody
+ B) @PathVariable
+ C) @RequestParam
+ D) @ResponseBody
+
+
+
+Q. Hagrid is using Spring Data JPA but needs a custom query for fetching users 
+with a specific status. How should he define it?
+ A) Use @Query("SELECT u FROM User u WHERE u.status = ?1") in the repository
+ B) Use findByStatus() method in JpaRepository
+ C) Use raw JDBC calls inside the repository
+ D) Call entityManager.createQuery("SELECT * FROM users WHERE status=?")
+
+
+
+Q. Ron needs to configure a repository in Spring Boot that supports paging 
+and sorting. Which interface should he use?
+ A) PagingAndSortingRepository
+ B) CrudRepository
+ C) JpaRepository
+ D) DataRepository
+
+
+
+Q. Dumbledor🧙‍♂️ is using data.sql inside src/main/resources/ path to execute a "Insert" query.
+   But he is getting this following error: ```Table "UR_TABLE" not found (this database is empty);```
+   Now what he needs to add inside `application.properties`?
+ A) spring.mvc.view.prefix=/src/main/resources/data.sql
+ B) spring.jpa.defer-datasource-initialization=true
+ C) spring.datasource.url=jdbc:h2:file:./data/testdb
+ D) None of the above
+
+
+
+Q. Hermionne's Spring Boot microservice needs to handle multiple configurations 
+for di erent environments (Dev, Test, Prod). What is the best approach?
+ A) Use application-dev.yml, application-test.yml, application-prod.yml and activate using 
+profiles
+ B) Store all configurations in a single application.properties file
+ C) Use an external database for storing environment-specific configurations
+ D) Modify configurations manually before deploying
+
+
+
+
+Q. Pancy is debugging her Spring Boot application and wants to enable 
+debugging logs only for database operations. What should she configure?
+ A) logging.level.org.springframework.jdbc=DEBUG
+ B) spring.jpa.show-sql=true
+ C) debug=true
+ D) spring.datasource.debug=true
+
+
+
+Q. Harry wants to secure certain endpoints in his Spring Boot REST API and 
+allow only authenticated users to access them. What should he configure?
+ A) Use http.authorizeRequests().anyRequest().authenticated() in SecurityConfig
+ B) Set spring.security.enable=true in application.properties
+ C) Create a custom security filter and add if (user != null) checks manually
+ D) Implement authentication logic inside the controller
+
+
+
+Q. Ginny is developing a Spring Boot application where she needs to use 
+di erent sets of beans for di erent environments. What is the best approach?
+A) Use @Profile("dev") and @Profile("prod") annotations on beans
+ B) Manually switch beans in application.properties
+ C) Use @Autowired to inject environment-specific beans at runtime
+ D) Define all beans in one configuration class and enable/disable manually
+
+
+
+Q. George wants to ensure that passwords are encrypted in his Spring Boot 
+application before saving them to the database. What should he use?
+ A) BCryptPasswordEncoder
+ B) MD5 hashing
+ C) AES encryption
+ D) Base64 encoding
+
+
+
+Q. Moody wants to use constructor-based dependency injection instead of 
+field injection in his Spring Boot application. What should he do?
+ A) Use @Autowired on the constructor instead of fields
+ B) Use @Inject on private fields
+ C) Call new Service() inside the component
+ D) Use @Bean annotation on fields
+
+
+
+Q. Fred is using Spring Boot and wants to ensure that a DELETE request only 
+deletes a record if it exists. What should he do?
+ A) Use DELETE FROM table WHERE id = ? in a native query
+ B) Call deleteById() without checking and handle exceptions manually
+ C) Check existence with findById() before calling deleteById()
+ D) Allow the API to return 200 OK even if the record doesn't exist.
+
+
+
+
+Q. Tom-Riddle is configuring security in his Spring Boot application and wants to 
+allow unauthenticated users to access the login API. What should he do?
+A) Use http.authorizeRequests().antMatchers("/login").permitAll()
+ B) Remove Spring Security from the project
+ C) Disable authentication for all API endpoints
+ D) Manually validate user credentials inside the controller
+
+
+
+Q. Harry is deploying a Spring Boot microservice and wants to externalize its 
+configuration for di erent environments (dev, test, prod). What should she use?
+ A) Manually change configurations before every deployment
+ B) Hardcode configuration inside the main application class
+ C) Use System.getenv() for all configurations
+ D) Spring Profiles (application-{profile}.properties)
+
+
+
 Q. 
+
+
 
 - --------------------------------------------⭐SET-II ENDS⭐--------------------------------------------
 
