@@ -1,0 +1,231 @@
+# MADHUR'S CHEAT SHEET FOR SPRING-BOOT ⭐😉💻📚
+
+- ----------------------------------------------✨ INDEX ✨---------------------------------------------------
+
+💡 CHAPTER I   : INTRODUCTION TO JWT
+
+💡 CHAPTER II  : STOP TALKING, START CODING 🧠
+
+
+- ----------------------------------------------✨ INDEX ✨---------------------------------------------------
+					<< LET'S START LEARNING 😊 >>
+
+
+
+
+
+- -------------------------------------------INTRODUCTION TO JWT-----------------------------------------
+
+- ----------------------------------------------✨CHAPTER-I✨--------------------------------------------
+
+# Understanding Spring Boot Security With JWT ✨
+
+
+⭐ We define "SpringSecurity / SecurityFilterChain" inside HttpSecurity
+
+⭐ This JwtFilter will come into action when there will be a request coming with a `Header` called as "JWT". Header: {"Authorization":"Bearer_token_value"}
+
+⭐ Whenever a request comes, We analyze that particular end-point & We need "AuthenticationManager" to confirm whether the Username & password exists in the database.
+
+
+					     HttpSecurity[FilterChain --> HttpSecurity.build()] 👀
+	    					^
+						|
+						|
+ [Header->JWT]					|
+-Request--- > [DispatcherServlet] -------> [SpringSecurity/SecurityFilterChain] --------> [Controller]
+
+		          | [UsernamePassword|	             |[CSRFFilter]|
+			  | Authentication   |	   	     |		  |
+			  | Filter]          |   [JwtFilter] |		  |
+				        (Chain of Responsibility)
+						     |
+						     |
+						     v
+				 JwtUtil / JwtHelper / JwtAuthentication ()
+
+
+⭐ UsernamePasswordAuthenticationFilter (Default FilterChain By SB) 
+
+⭐ JwtFilter (aka JwtAuthFilter / JwtAuthenticationFilter): We add our custom filter in front-of "Default-Filter", 
+							   & we want our filter to be present in the beginning, The very first controller.✔
+  
+  -> JwtFilter, Extracts the token & performs the necessary operations.
+
+  -> Class: 
+	1). JwtUtil(JwtHelper / JwtService) [To generate the token / Validate the token / Extract information(Expiration) from token]
+
+
+
+⭐ Additional Beans (Not part of this above core-framework But required by "Spring-Security"):
+
+	- UserDetails		: User & Password
+	- UserDetailsService	: Service Layer (To manipulate the user)
+	- PasswordEncoder	: Hashing the password
+	- AuthenticationManager : Handle the public-End-Point [It uses AuthenticationProvider further]
+	- AuthenticationProvider: Used by AuthManager
+
+
+
+
+*-------------------------------*-------------------------------*
+
+# Packages:
+
+- model
+
+- service    [To implement UserDetailService]
+
+- repository [Interact with DB & Create the User]
+
+- security   [To update my SecurityFilterChain & Create JWTUtil / AuthenticationFilter]
+
+- config     [To implement additional beans (AuthenticationManager etc...)]
+
+- controller
+
+
+*-------------------------------*-------------------------------*
+
+
+# JWT authentication flow:
+
+⭐ JWT   -> Json Web Token [An open-source RFC 7519 method for representing claims securely b/w 2 parties.]
+	-> build with 3 parts---> x.y.z
+
+	-> x -> header: {"alg":"HS256", "typ":"JWT"} [RED Color]
+	-> y -> payload<DATA>: {"sub":"12345", "name":"harry-potter", "iat":123456} [PINK Color]
+	-> z -> <Varify signature[include ecoded Header, Payload (E(header) / E(Payload)) + secret key]> [Blue Color]
+	
+	-> This token is given to client & later on we token if it is valid...😊
+
+   
+      _________________________________________________________________________________________________________________
+	💻 client					          		💫 server <private APIs>
+      _________________________________________________________________________________________________________________
+	1). POST/authenticate with username & password ------------------> 2). Validate the username & password.
+									       Generate the JWT token using secret key🗝
+										  |
+										  |
+	3). Return the generated JWT <--------------------------------------------|
+
+
+	4). GET/data with JWT in the header  ----------------------------> 5). Validate JWT token using secret key
+										  |
+										  |
+	6).🥇 Return the response <-----------------------------------------------|
+      __________________________________________________________________________________________________________________
+
+
+
+
+- --------------------------------------------⭐CHAPTER-I ENDS⭐----------------------------------------------
+
+
+
+
+
+
+
+
+- --------------------------------------STOP TALKING, START CODING 🧠----------------------------------------
+
+- ---------------------------------------------✨CHAPTER-II✨------------------------------------------------
+
+
+# 1. POM POM 🎊
+
+```POM
+				
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.12.6</version>
+		</dependency>
+```
+
+```APPLICATION.PROPS
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.password=
+spring.datasource.username=
+spring.datasource.driver-class-name=org.h2.Driver
+
+spring.jpa.database=H2
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.level.org.springframework.jdbc=DEBUG
+
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+```
+
+________________________________________________________________________________________________________________________
+💡 IMPLEMENTING USERDETAILS:
+	⭐ By default, Spring-Security uses a generic "UserDetails" object internally to represent authenticated users.
+	⭐ By implementing "UserDetails" in our "User" entity class, We are saying to Spring: "Hey 🔈, Here's how you can find the username, password & roles for this user"
+	⭐ Implementing "User-Details" interface in Spring-Security makes our "User" class compatible with "Spring-Security's authentication framework", it tells spring-security how to `understand & work with our custom "USER" entity for login / role-checking & authorization`.
+________________________________________________________________________________________________________________________
+
+
+```MODEL💃
+@Entity
+@Table(name="my_user")
+public class User implements UserDetails {
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private int id;
+	@Column
+	private String email;
+	@Column
+	private String pass;
+
+	Constructor & Getter-Setters...
+	
+	@OneToOne(fetch= FetchType.EAGER)
+	@JoinColumn(name="role_id", referencedColumnName="id")
+	private Role role;
+	
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities(){
+		HashSet<GrantedAuthority> roleSet = new HashSet<>();
+		roleSet.add(new SimpleGrantedAuthority(this.role.getRoleName()));
+		
+		// return Set.of(new SimpleGrantedAuthority(this.role.getRoleName()));
+	}
+
+	// IF USING SB V-2
+	// SOME MORE UNIMPLEMENTED METHOD --> return true in all of them...}
+
+@Entity
+@Table(name="role")
+public class Role {
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private int id;
+	@Column(name="role_name")
+	private String roleName;
+
+	Constructor & Getter-Setters & toString...}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- -------------------------------------------⭐CHAPTER-II ENDS⭐----------------------------------------------
+
+
