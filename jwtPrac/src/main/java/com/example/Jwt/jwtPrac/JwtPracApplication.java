@@ -11,3 +11,6 @@ public class JwtPracApplication {
 	}
 
 }
+// EnableAutoConfiguration: Auto. configures our application based on dependencies in our class-path
+// Configuration          : 
+// ComponentScan		  : 

@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.example.Jwt.jwtPrac.repo.UserRepo;
 
 public class UserService implements UserDetailsService {
-
 	@Autowired
 	UserRepo userRepo;
 	
