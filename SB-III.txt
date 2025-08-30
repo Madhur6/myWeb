@@ -6,6 +6,11 @@
 
 💡 CHAPTER II  : STOP TALKING, START CODING 🧠
 
+💡 CHAPTER III : ADDITIONAL BEANS ➕➕
+
+💡 CHAPTER IV  : Register our `custom-jwt-filer` to `original-jwt-filter-chain` ➕💫
+
+💡 CHAPTER V   : COOK👩‍🍳 SOME USERS 🥪🍱
 
 - ----------------------------------------------✨ INDEX ✨---------------------------------------------------
 					<< LET'S START LEARNING 😊 >>
@@ -132,6 +137,92 @@
 
 - ---------------------------------------------✨CHAPTER-II✨------------------------------------------------
 
+
+
+________________________________________________________________________________________________________________________
+💡 FLOW 🦅🦅🦅:
+	⭐ 1. User submits login form > ```POST /login | Body: username=harry&password=123```
+	⭐ 2. "UsernamePasswordAuthenticationFilter" prevents the request from continuing...
+		- This filter is auto. registered in the Spring-Security-Filter-Chain.
+		- Extracts the "username" & "password" from the request.
+		- Creates an "Authentication" object -> ```UsernamePasswordAuthenticationToken(username, password)```
+		- Calls "authenticationManager.authenticate(authRequest)"
+	⭐ 3. "AuthenticationManager" delegates to "AuthenticationProvider"
+		- By default, Spring uses: "DaoAuthenticationProvider"
+		- Which is a provider, Designed to work with "UserDetailsService"
+		- "DaoAuthenticationProvider" calls "userDetailsService.loadUserByUsername()"
+		- This is where our configured "UserDetailsService" bean (from @Bean or @Service) is invoked.
+		- This returns a "UserDetails" object -- In our case, It is our "User" entity (Since it implements "UserDetails").
+		- "DaoAuthenticationProvider" compares passwords.
+		- If passwords don't match, An exception is thrown.
+	⭐ 4. Checks "UserDetails" flags, 
+		- isAccountNonLocked() / isEnabled() / isCredentialsNonExpired() / isAccountNonExpired()
+		- If any of these are "false", Authentication fails.
+		- Else, Returns authenticated "Authentication" object: UsernamePasswordAuthenticationToken(userDetails, null, authorities)
+		- Spring-Security now considers the user authenticated.😊
+
+	⭐ 5. "SecurityContextHolder" is updated
+		- The authenticated object is stored in the security context:```SecurityContextHolder.getContext().setAuthentication(authResult);```
+		- This context stays active for request lifecycle.
+
+	⭐ 6. Request proceeds with authenticated user:
+		- Now user can access protected routes(@PreAuthorize / hasRole() ... ) based on the roles(GrantedAuthority)
+			returned in "getAuthorities()" of our "User".
+_____________________________________________________________________________________________________________
+
+________________________________________________________________________________________________________________________
+💡 AUTHENTICATION FLOW DIAGRAM:
+
+	[User submits login form] ⭐🧠
+		|
+		v
+	UsernamePasswordAuthenticationFilter
+		|
+		v
+	Creates UsernamePasswordAuthenticationToken
+		|
+		v
+	AuthenticationManager.authenticate(token)
+		|
+		v
+	DaoAuthenticationProvider supports(token)
+		|
+		v
+	UserDetailsService.loadUserByUsername(username)
+		|
+		v
+	-> Returns userDetails (Our User entity)
+		|
+		v
+	passwordEncoder.matches(raw, encoded)
+		|
+		v
+	Check account flags(enabled, locked etc)
+		|
+	_________________
+	|		|
+	V		V
+	[Valid User]    [Invalid Credentials]
+	     |                  	|
+	     V				V
+	Security		Exception(401) ❌😒
+	Context
+	Holder.
+	.Set
+  Authentication()
+	     |
+	     V
+	Access
+  Granted to
+  protected
+  resources ✔
+	
+____________________________________________________________________________________________________________
+
+
+
+
+
 # 1. POM POM 🎊
 
 ```POM
@@ -180,8 +271,15 @@ public class User implements UserDetails {
 	private String pass;
 
 	Constructor & Getter-Setters...
-	
-	@OneToOne(fetch= FetchType.EAGER)
+
+________________________________________________________________________________________________________________________
+💡 @ManyToOne ❔:
+	- If we use @OneToOne() annotation, my_user table will have a unique constraint on role_id, So only one user can be linked to a given role.
+	- So, When we will try to insert multiple users with the same role, The DB will block❌ it.
+________________________________________________________________________________________________________________________
+
+
+	@ManyToOne(fetch= FetchType.EAGER)
 	@JoinColumn(name="role_id", referencedColumnName="id")
 	private Role role;
 	
@@ -195,6 +293,8 @@ public class User implements UserDetails {
 
 	// IF USING SB V-2
 	// SOME MORE UNIMPLEMENTED METHOD --> return true in all of them...}
+
+
 
 @Entity
 @Table(name="role")
@@ -417,7 +517,294 @@ ________________________________________________________________________________
 
 
 
-
 - -------------------------------------------⭐CHAPTER-II ENDS⭐----------------------------------------------
+
+
+
+
+
+
+
+- ------------------------------------------ADDITIONAL BEANS ➕➕--------------------------------------------
+
+- ---------------------------------------------✨CHAPTER-III✨-----------------------------------------------
+
+
+________________________________________________________________________________________________________________________
+💡 1. AuthenticationProvider 😊
+	"AuthenticationManager" delegates to "AuthenticationProvider"
+		- By default, Spring uses: "DaoAuthenticationProvider"
+		- Which is a provider, Designed to work with "UserDetailsService"
+		- "DaoAuthenticationProvider" calls "userDetailsService.loadUserByUsername()"
+		- This is where our configured "UserDetailsService" bean (from @Bean or @Service) is invoked.
+		- This returns a "UserDetails" object -- In our case, It is our "User" entity (Since it implements "UserDetails").
+		- "DaoAuthenticationProvider" compares passwords.
+		- If passwords don't match, An exception is thrown.
+________________________________________________________________________________________________________________________
+
+```config 
+// ⭐ METHOD-I ⭐
+@Configuration
+public class ApplicationConfig {
+	@Autowired
+	UserDetailsService userDetailsService;
+
+	@Bean
+	@SuppressWarnings("deprecation")
+	PasswordEncoder encoder(){
+		return NoOpPasswordEncoder.getInstance();
+	}
+
+	@Bean
+	AuthenticationProvider authenticationProvider(){
+		// type cntrl+t > Use DAO 😉 
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		
+		authProvider.setPasswordEncoder(encoder());
+
+		// Using the @Autowired injected object 🐱
+		authProvider.setUserDetailsService(userDetailsService);
+
+		return authProvider;
+	}
+}
+```
+
+
+```config 
+// ⭐ METHOD-II ⭐
+@Configuration
+public class ApplicationConfig {
+	@Autowired
+	UserRepo userRepo;
+
+	@Bean
+	UserDetailsService userDetailsService(){
+		return username -> userRepo.findByEmail(username)
+					.orElseThrow(() -> new UsernameNotFoundException("User is not found"));
+	}
+
+
+	@Bean
+	PasswordEncoder encoder(){
+		return NoOpPasswordEncoder.getInstance();
+	}
+
+	@Bean
+	AuthenticationProvider authenticationProvider(){
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
+		authProvider.setPasswordEncoder(encoder());
+
+		// Calling the method itself here 😊
+		authProvider.setUserDetailsService(userDetailsService()); 
+
+		return authProvider;
+	}
+}
+```
+
+
+
+```config 
+// ⭐ AuthenticationManager ⭐
+@Configuration
+public class ApplicationConfig {
+	@Autowired
+	UserRepo userRepo;
+
+	@Bean
+	UserDetailsService userDetailsService(){
+		..................................
+	}
+
+	@Bean
+	PasswordEncoder encoder(){
+		..................................
+	}
+
+	@Bean
+	AuthenticationProvider authenticationProvider(){
+		..................................
+		return authProvider;
+	}
+
+	// ⭐✔⭐
+	@Bean
+	AuthenticationManager authenticationManager(@Autowired /*[for SB < 2]*/ AuthenticationConfiguration configuration) throws Exception {
+		return configuration.getAuthenticationManager();
+	}
+}
+```
+
+
+
+
+
+
+
+- -------------------------------------------⭐CHAPTER-III ENDS⭐----------------------------------------------
+
+
+
+
+
+
+
+
+- -----------------------Register our `custom-jwt-filer` to `original-jwt-filter-chain` ➕💫-----------------
+
+- ----------------------------------------------✨CHAPTER-IV✨-----------------------------------------------
+
+
+________________________________________________________________________________________________________________________
+💡 filterChain:
+	- I.  We need to disable the .csrf [Otherwise, Our request will accept this ".csrf" token along with other tokens in Header]
+	- II. Purpose of JWT:
+		- We are not storing for how long the user was logged-in, Basically we are not storing `cookies`.
+	- III.Register our `custom-filter-chain`.
+	- IV. Register:
+		- Public-Handler      [AuthenticationProvider handles this🧙‍♂️]
+		- Protected-Resources 
+	- V.  return httpSecurity.build(); 🍃
+________________________________________________________________________________________________________________________
+
+```config
+@Configuration
+public class SecurityConfig {
+	// I need to keep this custom-filter in front,
+	// Before Spring-Boot default filter: UsernamePasswordAuthenticationFilter
+	@Autowired
+	JwtAuthenticationFilter authenticationFilter;
+
+	@Autowired
+	AuthenticationProvider authProvider;
+	
+	private final String[] WHITE_LIST_URL = {"/login"};
+
+// ⭐
+//	private static final String[] WHITE_LIST_URLS = {
+//		    "/login",
+//		    "/swagger-ui/**",
+//		    "/v3/api-docs/**",
+//		    "/swagger-ui.html"
+//		};
+// ⭐
+
+	@Bean
+	SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+		httpSecurity.csrf(csrf -> csrf.disable());
+
+		httpSecurity.sessionManagement(
+				sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+		httpSecurity.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+		// Public-Handler
+		httpSecurity.authenticationProvider(authProvider);
+
+		// Protected-Resources
+		httpSecurity.authorizeHttpRequests(httpConfig ->{
+			httpConfig.requestMatchers(WHITE_LIST_URL).permitAll().anyRequest().authenticated();
+		});
+
+		return httpSecurity.build();
+	}
+}
+```
+
+
+- --------------------------------------------⭐CHAPTER-IV ENDS⭐----------------------------------------------
+
+
+
+
+
+
+
+
+
+- -------------------------------------------COOK👩‍🍳 SOME USERS 🥪🍱-------------------------------------------
+
+- -----------------------------------------------✨CHAPTER-V✨------------------------------------------------
+
+________________________________________________________________________________________________________________________
+💡 AppRunner 🏃‍♂️🏃‍♀️
+	- AppRunner Class : To create some users
+
+	* 2 Interfaces are available: 
+		- ApplicationRunner : This accepts ApplicationArguments as object. 
+		- CommandLineRunner : This accepts String array: String.. args.
+________________________________________________________________________________________________________________________
+
+```config
+@Configuration
+public class AppRunner implements ApplicationRunner {
+	@Autowired
+	RoleRepo roleRepo;
+
+	@Autowired
+	UserRepo userRepo;
+	
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		Role role1 = new Role();
+		role1.setRoleName("ADMIN");
+		
+		Role role2 = new Role();
+		role2.setRoleName("USER");
+		
+		Role saveRole1 = roleRepo.save(role1);
+		Role saveRole2 = roleRepo.save(role2);
+		
+		
+		User user = new User();
+		user.setEmail("harry@gmail.com");
+		user.setPass("123");
+		user.setRole(saveRole1);
+		
+		User user1 = new User();
+		user1.setEmail("ron@gmail.com");
+		user1.setPass("456");
+		user1.setRole(saveRole2);
+		
+		
+		User user2 = new User();
+		user2.setEmail("hermionne@gmail.com");
+		user2.setPass("321");
+		user2.setRole(saveRole2);
+		
+
+		// Seeing an error here❔
+		// Error: The method save(S) in the type CrudRepository<User,Integer> is not applicable for the arguments (User)
+		// 	- Check imports for "User" in userRepo / AppRunner and other classes
+		// 	- Make sure it imports from our custom "User" [model] 😊
+		userRepo.save(user);
+		userRepo.save(user1);
+		userRepo.save(user2);
+		
+		
+	
+	    	System.out.println("USER******************:" + userRepo.findAll());
+		
+	}
+}
+
+________________________________________________________________________________________________________________________
+💡 RUN the application 🏃‍♀️🏃‍♂️🥇
+________________________________________________________________________________________________________________________
+
+
+
+
+
+
+
+
+
+- ---------------------------------------------⭐CHAPTER-V ENDS⭐----------------------------------------------
+
+
+
 
 
